@@ -3,6 +3,51 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --background: 40 33% 97%;
+    --foreground: 217 33% 11%;
+    --card: 40 33% 97%;
+    --card-foreground: 217 33% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 217 33% 11%;
+    --primary: 330 81% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 40 60% 58%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 330 50% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 330 50% 96%;
+    --accent-foreground: 217 33% 11%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 35 24% 92%;
+    --input: 35 24% 92%;
+    --ring: 330 81% 60%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 217 33% 11%;
+    --foreground: 214 32% 91%;
+    --card: 217 26% 17%;
+    --card-foreground: 214 32% 91%;
+    --popover: 217 26% 17%;
+    --popover-foreground: 214 32% 91%;
+    --primary: 330 81% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 40 60% 58%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 217 26% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 26% 17%;
+    --accent-foreground: 214 32% 91%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 217 19% 27%;
+    --input: 217 19% 27%;
+    --ring: 330 81% 60%;
+  }
+
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
