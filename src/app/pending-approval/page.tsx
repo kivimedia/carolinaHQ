@@ -3,6 +3,8 @@
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 
+export const dynamic = 'force-dynamic';
+
 export default function PendingApprovalPage() {
   const supabase = createClient();
   const router = useRouter();
