@@ -25,7 +25,6 @@ import ClientBrainPanel from '@/components/client/ClientBrainPanel';
 import CardApprovalPanel from './CardApprovalPanel';
 import LeadInfoPanel from './LeadInfoPanel';
 import DidntBookPanel from './DidntBookPanel';
-import CardAIChat from './CardAIChat';
 import ReactMarkdown from 'react-markdown';
 import { MarkdownToolbarUI } from './MarkdownToolbar';
 import { useMentionDropdown } from './useMentionDropdown';
@@ -570,11 +569,10 @@ export default function CardModal({ cardId, boardId, onClose, onRefresh, allCard
               {/* Properties toggle */}
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-medium transition-colors shrink-0 ${
-                  sidebarOpen
-                    ? 'bg-electric/10 text-electric border border-electric/30'
-                    : 'bg-cream dark:bg-navy border border-cream-dark dark:border-slate-700 text-navy/50 dark:text-slate-400 hover:bg-cream-dark dark:hover:bg-slate-800 hover:text-navy dark:hover:text-slate-200'
-                }`}
+                className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-medium transition-colors shrink-0 ${sidebarOpen
+                  ? 'bg-electric/10 text-electric border border-electric/30'
+                  : 'bg-cream dark:bg-navy border border-cream-dark dark:border-slate-700 text-navy/50 dark:text-slate-400 hover:bg-cream-dark dark:hover:bg-slate-800 hover:text-navy dark:hover:text-slate-200'
+                  }`}
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
                 <span className="hidden sm:inline">Properties</span>
@@ -674,9 +672,6 @@ export default function CardModal({ cardId, boardId, onClose, onRefresh, allCard
           )}
         </div>
 
-        {/* Card AI Chat */}
-        <CardAIChat cardId={cardId} boardId={boardId} />
-
         <div className="relative">
           {/* Main content */}
           <div className="space-y-5">
@@ -723,11 +718,10 @@ export default function CardModal({ cardId, boardId, onClose, onRefresh, allCard
                               key={tab}
                               type="button"
                               onClick={() => setShowDescriptionPreview(tab === 'Preview')}
-                              className={`px-3 py-1.5 text-xs font-medium border border-b-0 transition-colors font-body first:rounded-tl-lg last:rounded-tr-lg ${
-                                (tab === 'Preview') === showDescriptionPreview
-                                  ? 'bg-cream dark:bg-navy border-cream-dark dark:border-slate-700 text-navy dark:text-slate-100'
-                                  : 'bg-white dark:bg-slate-800/50 border-transparent text-navy/40 dark:text-slate-500 hover:text-navy/70'
-                              }`}
+                              className={`px-3 py-1.5 text-xs font-medium border border-b-0 transition-colors font-body first:rounded-tl-lg last:rounded-tr-lg ${(tab === 'Preview') === showDescriptionPreview
+                                ? 'bg-cream dark:bg-navy border-cream-dark dark:border-slate-700 text-navy dark:text-slate-100'
+                                : 'bg-white dark:bg-slate-800/50 border-transparent text-navy/40 dark:text-slate-500 hover:text-navy/70'
+                                }`}
                             >
                               {tab}
                             </button>

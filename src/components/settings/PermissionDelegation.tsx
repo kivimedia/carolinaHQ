@@ -159,9 +159,7 @@ export default function PermissionDelegation({ currentUserId }: PermissionDelega
     const grantedUserIds = new Set(getUserGrants(featureKey).map(g => g.granted_user_id));
     return profiles.filter(p => {
       const role = (p.user_role || p.role || 'member') as string;
-      // Don't show admins (they already have access)
       if (role === 'admin') return false;
-      if (p.agency_role === 'agency_owner') return false;
       // Don't show already-granted users
       if (grantedUserIds.has(p.id)) return false;
       return true;
@@ -236,11 +234,10 @@ export default function PermissionDelegation({ currentUserId }: PermissionDelega
                         <button
                           onClick={() => toggleRoleGrant(featureKey, role)}
                           disabled={!!saving}
-                          className={`w-6 h-6 rounded border-2 inline-flex items-center justify-center transition-all ${
-                            grantId
+                          className={`w-6 h-6 rounded border-2 inline-flex items-center justify-center transition-all ${grantId
                               ? 'bg-electric border-electric text-white'
                               : 'border-cream-dark dark:border-slate-600 hover:border-electric/50'
-                          } ${isSaving ? 'opacity-50' : ''}`}
+                            } ${isSaving ? 'opacity-50' : ''}`}
                         >
                           {grantId && (
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
