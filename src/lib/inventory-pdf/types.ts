@@ -1,6 +1,6 @@
 // PDF generation types for CarolinaHQ
 
-export type DocumentType = 'CONTRACT' | 'INVOICE' | 'QUOTE';
+export type DocumentType = 'CONTRACT' | 'INVOICE' | 'QUOTE' | 'PROPOSAL';
 
 export interface PdfCompanyInfo {
   name: string;
@@ -80,6 +80,10 @@ export interface GenerateDocumentOptions {
     terms?: PdfPolicyContent;
   };
   showItemImages?: boolean;
+  // Proposal-specific fields
+  personalNote?: string;
+  eventType?: string;
+  surcharges?: { label: string; amount: number }[];
 }
 
 // Carolina Balloons branded colors (RGB tuples)

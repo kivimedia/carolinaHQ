@@ -29,7 +29,7 @@ export function generateDocumentPdfSync(options: GenerateDocumentOptions): jsPDF
   setColor(CB_COLORS.pink);
   doc.setFontSize(20);
   doc.setFont('helvetica', 'bold');
-  const title = documentType === 'INVOICE' ? 'INVOICE' : documentType === 'QUOTE' ? 'QUOTE' : 'CONTRACT';
+  const title = documentType === 'PROPOSAL' ? 'PROPOSAL' : documentType === 'INVOICE' ? 'INVOICE' : documentType === 'QUOTE' ? 'QUOTE' : 'CONTRACT';
   doc.text(title, MARGIN.left, y + 7);
 
   // Company info (right side)
@@ -152,6 +152,15 @@ export function generateDocumentPdfSync(options: GenerateDocumentOptions): jsPDF
     y += 5;
   }
 
+  // Surcharges (proposal-specific)
+  if (options.surcharges && options.surcharges.length > 0) {
+    for (const surcharge of options.surcharges) {
+      doc.text(`${surcharge.label}:`, totalsX, y);
+      doc.text(formatCurrency(surcharge.amount), pageWidth - MARGIN.right, y, { align: 'right' });
+      y += 5;
+    }
+  }
+
   if (project.discountAmount && project.discountAmount > 0) {
     doc.text('Discount:', totalsX, y);
     setColor([220, 38, 38]); // red
@@ -176,6 +185,28 @@ export function generateDocumentPdfSync(options: GenerateDocumentOptions): jsPDF
   doc.text('TOTAL:', totalsX, y + 4);
   doc.text(formatCurrency(project.total), pageWidth - MARGIN.right, y + 4, { align: 'right' });
   y += 14;
+
+  // Personal note (proposals only)
+  if (documentType === 'PROPOSAL' && options.personalNote) {
+    if (y > 230) { doc.addPage(); y = MARGIN.top; }
+    setColor(CB_COLORS.pink);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.text('A Note From Halley', MARGIN.left, y);
+    y += 5;
+
+    // Blush background box
+    const noteLines = doc.splitTextToSize(options.personalNote, contentWidth - 8);
+    const noteHeight = noteLines.length * 4 + 6;
+    setFillColor(CB_COLORS.lightBg);
+    doc.roundedRect(MARGIN.left, y - 2, contentWidth, noteHeight, 2, 2, 'F');
+
+    setColor(CB_COLORS.navy);
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(9);
+    doc.text(noteLines, MARGIN.left + 4, y + 2);
+    y += noteHeight + 4;
+  }
 
   // Policies
   if (policies && documentType !== 'INVOICE') {

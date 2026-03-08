@@ -6,6 +6,7 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 import KeyboardShortcutsProvider from '@/components/layout/KeyboardShortcutsProvider';
 import ProfilingPopup from '@/components/profiling/ProfilingPopup';
 import PageProfiler from '@/components/profiling/PageProfiler';
+import { SkinProvider } from '@/lib/skin-context';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -23,11 +24,13 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <KeyboardShortcutsProvider>
-          {children}
-          <PageProfiler />
-          <ProfilingPopup />
-        </KeyboardShortcutsProvider>
+        <SkinProvider>
+          <KeyboardShortcutsProvider>
+            {children}
+            <PageProfiler />
+            <ProfilingPopup />
+          </KeyboardShortcutsProvider>
+        </SkinProvider>
       </QueryClientProvider>
     </ErrorBoundary>
   );

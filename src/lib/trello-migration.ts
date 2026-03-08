@@ -2038,6 +2038,7 @@ async function importAttachments(
             .insert({
               card_id: targetCardId,
               file_name: att.name || att.url,
+              file_url: att.url,
               file_size: 0,
               mime_type: 'text/uri-list',
               storage_path: att.url,
@@ -2122,12 +2123,22 @@ async function importAttachments(
           return;
         }
 
+        // Build public file_url for the attachment record
+        let fileUrl: string;
+        if (finalStoragePath.startsWith('s3://')) {
+          fileUrl = finalStoragePath; // S3 presigned URLs generated on demand
+        } else {
+          const { data: urlData } = supabase.storage.from('card-attachments').getPublicUrl(finalStoragePath);
+          fileUrl = urlData.publicUrl;
+        }
+
         // Create attachment record in DB
         const { data: attachment, error: dbError } = await supabase
           .from('attachments')
           .insert({
             card_id: targetCardId,
             file_name: att.name,
+            file_url: fileUrl,
             file_size: actualSize || att.bytes || 0,
             mime_type: att.mimeType || 'application/octet-stream',
             storage_path: finalStoragePath,

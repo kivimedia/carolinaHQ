@@ -71,12 +71,22 @@ export async function POST(request: NextRequest, { params }: Params) {
       storageMethod = 'supabase';
     }
 
+    // Build public file_url for the attachment record
+    let fileUrl: string;
+    if (storageMethod === 's3') {
+      fileUrl = storagePath; // S3 presigned URLs generated on demand
+    } else {
+      const { data: urlData } = supabase.storage.from('card-attachments').getPublicUrl(storagePath);
+      fileUrl = urlData.publicUrl;
+    }
+
     // Create attachment record in DB
     const { data, error } = await supabase
       .from('attachments')
       .insert({
         card_id: cardId,
         file_name: file.name,
+        file_url: fileUrl,
         file_size: file.size,
         mime_type: file.type || 'application/octet-stream',
         storage_path: storagePath,

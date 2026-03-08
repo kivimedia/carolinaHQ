@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import NotificationCenter from '@/components/notifications/NotificationCenter';
 import ThemeToggle from './ThemeToggle';
+import SkinToggle from './SkinToggle';
 import { useAppStore } from '@/stores/app-store';
 
 interface HeaderProps {
@@ -49,6 +50,7 @@ export default function Header({ title, backHref, children }: HeaderProps) {
         )}
       </div>
       <div className="flex items-center gap-2 sm:gap-3">
+        <SkinToggle />
         <ThemeToggle />
         <NotificationCenter />
         {children}

@@ -27,6 +27,7 @@ interface CreateAttachmentBody {
   file_size: number;
   mime_type: string;
   storage_path: string;
+  file_url?: string;
 }
 
 export async function POST(request: NextRequest, { params }: Params) {
@@ -36,7 +37,7 @@ export async function POST(request: NextRequest, { params }: Params) {
   const body = await parseBody<CreateAttachmentBody>(request);
   if (!body.ok) return body.response;
 
-  const { file_name, file_size, mime_type, storage_path } = body.body;
+  const { file_name, file_size, mime_type, storage_path, file_url } = body.body;
 
   if (!file_name?.trim()) return errorResponse('file_name is required');
   if (!storage_path?.trim()) return errorResponse('storage_path is required');
@@ -46,11 +47,23 @@ export async function POST(request: NextRequest, { params }: Params) {
   const { supabase, userId } = auth.ctx;
   const cardId = params.id;
 
+  // Use provided file_url or generate public URL from storage_path
+  let resolvedFileUrl = file_url?.trim();
+  if (!resolvedFileUrl) {
+    if (storage_path.startsWith('s3://')) {
+      resolvedFileUrl = storage_path.trim();
+    } else {
+      const { data: urlData } = supabase.storage.from('card-attachments').getPublicUrl(storage_path.trim());
+      resolvedFileUrl = urlData.publicUrl;
+    }
+  }
+
   const { data, error } = await supabase
     .from('attachments')
     .insert({
       card_id: cardId,
       file_name: file_name.trim(),
+      file_url: resolvedFileUrl,
       file_size,
       mime_type: mime_type.trim(),
       storage_path: storage_path.trim(),

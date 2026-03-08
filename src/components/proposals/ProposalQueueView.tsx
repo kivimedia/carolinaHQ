@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import ProposalQueueList from './ProposalQueueList';
 import ProposalDetailPanel from './ProposalDetailPanel';
 
@@ -117,8 +118,8 @@ export default function ProposalQueueView() {
 
   return (
     <div className="flex-1 overflow-hidden flex flex-col">
-      {/* Filter Tabs */}
-      <div className="border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6">
+      {/* Filter Tabs + New Proposal button */}
+      <div className="border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 flex items-center justify-between">
         <nav className="flex space-x-4 overflow-x-auto py-2" aria-label="Tabs">
           {FILTER_TABS.map((tab) => (
             <button
@@ -146,6 +147,16 @@ export default function ProposalQueueView() {
             </button>
           ))}
         </nav>
+        <Link
+          href="/proposals/builder"
+          className="shrink-0 ml-4 px-3 py-1.5 text-xs font-medium rounded-md bg-cb-pink text-white hover:bg-cb-pink/90 transition-colors flex items-center gap-1.5"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          New Proposal
+        </Link>
       </div>
 
       {/* Content */}
