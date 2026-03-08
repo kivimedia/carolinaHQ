@@ -18,6 +18,7 @@ export interface LineItem {
   quantity: number;
   unitPrice: number;
   notes: string;
+  imageUrl?: string;
 }
 
 interface LineItemsTableProps {
@@ -98,21 +99,30 @@ export default function LineItemsTable({ items, onChange }: LineItemsTableProps)
                 className="p-1"
                 onClick={() => handleCellClick(item.id, 'name')}
               >
-                {isEditing(item.id, 'name') ? (
-                  <input
-                    autoFocus
-                    type="text"
-                    value={item.name}
-                    onChange={(e) => updateItem(item.id, 'name', e.target.value)}
-                    onBlur={handleCellBlur}
-                    onKeyDown={(e) => e.key === 'Enter' && handleCellBlur()}
-                    className="w-full px-2 py-1 text-xs rounded border border-cb-pink/40 bg-white dark:bg-slate-700 text-navy dark:text-white focus:outline-none focus:ring-1 focus:ring-cb-pink/40"
-                  />
-                ) : (
-                  <span className="px-2 py-1 text-xs text-navy dark:text-slate-200 cursor-text block truncate">
-                    {item.name || <span className="text-navy/30 dark:text-slate-500 italic">Click to edit</span>}
-                  </span>
-                )}
+                <div className="flex items-center gap-2">
+                  {item.imageUrl && (
+                    <img
+                      src={item.imageUrl}
+                      alt=""
+                      className="w-7 h-7 rounded object-cover shrink-0 bg-cream dark:bg-slate-600"
+                    />
+                  )}
+                  {isEditing(item.id, 'name') ? (
+                    <input
+                      autoFocus
+                      type="text"
+                      value={item.name}
+                      onChange={(e) => updateItem(item.id, 'name', e.target.value)}
+                      onBlur={handleCellBlur}
+                      onKeyDown={(e) => e.key === 'Enter' && handleCellBlur()}
+                      className="w-full px-2 py-1 text-xs rounded border border-cb-pink/40 bg-white dark:bg-slate-700 text-navy dark:text-white focus:outline-none focus:ring-1 focus:ring-cb-pink/40"
+                    />
+                  ) : (
+                    <span className="px-2 py-1 text-xs text-navy dark:text-slate-200 cursor-text block truncate">
+                      {item.name || <span className="text-navy/30 dark:text-slate-500 italic">Click to edit</span>}
+                    </span>
+                  )}
+                </div>
               </TableCell>
 
               {/* Category */}

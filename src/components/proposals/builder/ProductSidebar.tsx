@@ -10,6 +10,7 @@ interface Product {
   base_price: number | null;
   size_variants: { size: string; price: number }[] | null;
   notes: string | null;
+  image_url: string | null;
 }
 
 interface ProductSidebarProps {
@@ -128,13 +129,20 @@ export default function ProductSidebar({ onAddProduct, addedProductIds }: Produc
                         key={product.id}
                         onClick={() => !isAdded && onAddProduct(product)}
                         disabled={isAdded}
-                        className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors flex items-center justify-between gap-1 ${
+                        className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors flex items-center gap-2 ${
                           isAdded
                             ? 'bg-cb-pink/10 text-cb-pink cursor-default'
                             : 'hover:bg-cream dark:hover:bg-slate-700 text-navy dark:text-slate-200'
                         }`}
                       >
-                        <span className="truncate">{product.name}</span>
+                        {product.image_url && (
+                          <img
+                            src={product.image_url}
+                            alt=""
+                            className="w-8 h-8 rounded object-cover shrink-0 bg-cream dark:bg-slate-600"
+                          />
+                        )}
+                        <span className="truncate flex-1 min-w-0">{product.name}</span>
                         <span className="shrink-0 text-navy/40 dark:text-slate-500">
                           {isAdded ? (
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

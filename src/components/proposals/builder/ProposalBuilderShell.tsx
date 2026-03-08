@@ -122,6 +122,7 @@ export default function ProposalBuilderShell() {
       quantity: 1,
       unitPrice: product.base_price || 0,
       notes: '',
+      imageUrl: product.image_url || undefined,
     };
     setLineItems((prev) => [...prev, newItem]);
     setIsDirty(true);
