@@ -1371,11 +1371,10 @@ async function importCards(
       try {
         const { data: insertedCards, error: batchErr } = await supabase
           .from('cards')
-          .insert(batch.map(({ trelloCard, priority }) => ({
+          .insert(batch.map(({ trelloCard }) => ({
             title: trelloCard.name,
             description: trelloCard.desc || '',
             due_date: trelloCard.due,
-            priority,
             created_by: userId,
           })))
           .select();
@@ -1387,7 +1386,7 @@ async function importCards(
             try {
               const { data: card, error } = await supabase
                 .from('cards')
-                .insert({ title: trelloCard.name, description: trelloCard.desc || '', due_date: trelloCard.due, priority, created_by: userId })
+                .insert({ title: trelloCard.name, description: trelloCard.desc || '', due_date: trelloCard.due, created_by: userId })
                 .select().single();
               if (error || !card) { report.errors.push(`Failed to create card "${trelloCard.name}": ${error?.message}`); continue; }
               await supabase.from('card_placements').insert({ card_id: card.id, list_id: targetListId, position: listPos, is_mirror: false });
