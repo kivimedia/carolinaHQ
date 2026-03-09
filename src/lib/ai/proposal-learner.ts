@@ -78,13 +78,23 @@ export interface VoiceProfile {
 // Constants
 // ---------------------------------------------------------------------------
 
-const PROPOSAL_LIST_NAMES = [
-  'Proposal/Pricing Sent',
-  'Invoice Sent',
-  'Paid in Full',
-  'Needs Invoice',
-  'Needs Thank You',
-  'Thank You Sent / Complete',
+/**
+ * Patterns to match proposal-related list names (case-insensitive substring).
+ * Covers variations like "Sent Pricing or Proposal", "Invoice  Sent", "Paid In Full", etc.
+ */
+const PROPOSAL_LIST_PATTERNS = [
+  'proposal',
+  'pricing sent',
+  'sent pricing',
+  'invoice',
+  'paid',
+  'needs invoice',
+  'needs thank you',
+  'thank you sent',
+  'thank you email',
+  'completed',
+  'complete',
+  'guide sent',
 ];
 
 // ---------------------------------------------------------------------------
@@ -116,8 +126,21 @@ export async function* runLearningPipeline(
 
   // Step 3: Extract proposal content via AI
   yield { step: 'extract', current: 2, total: 6, message: 'Extracting proposal details with AI...' };
+  const { createAnthropicClient } = await import('./providers');
+  const aiClient = await createAnthropicClient(supabase);
+  if (!aiClient) {
+    yield { step: 'extract', current: 3, total: 6, message: 'No AI API key configured. Go to Settings > AI Configuration to add your Anthropic key.' };
+    yield { step: 'done', current: 6, total: 6, message: 'Pipeline stopped: Add an Anthropic API key in Settings > AI Configuration, then re-run.' };
+    return;
+  }
   const extracted = await extractProposalContent(supabase, userId, enrichedCards);
   yield { step: 'extract', current: 3, total: 6, message: `Extracted details from ${extracted.length} proposals` };
+
+  if (extracted.length < 3) {
+    yield { step: 'patterns', current: 4, total: 6, message: `Need at least 3 proposals to build patterns (found ${extracted.length}). Add more proposal cards.` };
+    yield { step: 'done', current: 6, total: 6, message: `Pipeline complete with limited data. ${extracted.length} proposals extracted but 3+ needed for pattern building.` };
+    return;
+  }
 
   // Step 4: Build patterns
   yield { step: 'patterns', current: 3, total: 6, message: 'Identifying proposal patterns...' };
@@ -158,13 +181,23 @@ interface ProposalCard {
 }
 
 async function findProposalCards(supabase: SupabaseClient): Promise<ProposalCard[]> {
-  // Find lists with proposal-related names across all boards
-  const { data: lists } = await supabase
+  // Fetch all lists and filter by fuzzy pattern matching
+  const { data: allLists } = await supabase
     .from('lists')
-    .select('id, name')
-    .in('name', PROPOSAL_LIST_NAMES);
+    .select('id, name');
 
-  if (!lists || lists.length === 0) return [];
+  if (!allLists || allLists.length === 0) return [];
+
+  // Match lists whose names contain any of the proposal patterns (case-insensitive)
+  const lists = allLists.filter((l) => {
+    const lower = l.name.toLowerCase();
+    // Exclude "didn't book" / "dead leads" / "new client" type lists
+    if (lower.includes("didn't book") || lower.includes('didnt book') || lower.includes('dead lead')) return false;
+    if (lower.includes('needs proposal') || lower.includes('needs follow') || lower.includes('new client') || lower.includes('new inquiry')) return false;
+    return PROPOSAL_LIST_PATTERNS.some((pattern) => lower.includes(pattern));
+  });
+
+  if (lists.length === 0) return [];
 
   const listIds = lists.map((l) => l.id);
   const listNameMap = new Map(lists.map((l) => [l.id, l.name]));
