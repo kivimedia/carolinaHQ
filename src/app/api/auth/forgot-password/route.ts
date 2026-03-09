@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       type: 'recovery',
       email: email.trim(),
       options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://kmboards.co'}/reset-password`,
+        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://carolina-hq.vercel.app'}/auth/callback?next=/reset-password`,
       },
     });
 
