@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -12,25 +12,63 @@ export default function ResetPasswordForm() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
+  const [verifying, setVerifying] = useState(true);
   const [success, setSuccess] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
 
-  // On mount, let the Supabase client detect and exchange the recovery token from the URL hash
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
+    const verifyToken = async () => {
+      const tokenHash = searchParams.get('token_hash');
+      const type = searchParams.get('type');
+
+      if (tokenHash && type === 'recovery') {
+        // Verify the token_hash directly - no Supabase redirect needed
+        const { error } = await supabase.auth.verifyOtp({
+          token_hash: tokenHash,
+          type: 'recovery',
+        });
+
+        if (error) {
+          setError('This reset link is invalid or has expired. Please request a new one.');
+          setVerifying(false);
+          return;
+        }
+
         setReady(true);
+        setVerifying(false);
+        return;
       }
-    });
 
-    // Also check if user already has a session (e.g. navigated here directly)
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) setReady(true);
-    });
+      // Fallback: listen for auth state change (hash-based flow)
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+        if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
+          setReady(true);
+          setVerifying(false);
+        }
+      });
 
-    return () => subscription.unsubscribe();
-  }, [supabase]);
+      // Also check existing session
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        setReady(true);
+        setVerifying(false);
+      } else {
+        // No token_hash and no session - show error after a brief wait
+        setTimeout(() => {
+          setVerifying(false);
+          if (!ready) {
+            setError('No valid reset token found. Please request a new password reset link.');
+          }
+        }, 3000);
+      }
+
+      return () => subscription.unsubscribe();
+    };
+
+    verifyToken();
+  }, [searchParams, supabase]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,11 +111,24 @@ export default function ResetPasswordForm() {
     );
   }
 
-  if (!ready) {
+  if (verifying) {
     return (
       <div className="text-center space-y-4">
         <div className="animate-spin h-6 w-6 border-2 border-electric border-t-transparent rounded-full mx-auto" />
         <p className="text-navy/60 text-sm font-body">Verifying your reset link...</p>
+      </div>
+    );
+  }
+
+  if (!ready && error) {
+    return (
+      <div className="text-center space-y-4">
+        <div className="p-3 rounded-xl bg-danger/10 text-danger text-sm font-body">
+          {error}
+        </div>
+        <Button variant="ghost" onClick={() => router.push('/forgot-password')}>
+          Request a new reset link
+        </Button>
       </div>
     );
   }

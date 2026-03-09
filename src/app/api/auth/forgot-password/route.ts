@@ -4,7 +4,8 @@ import { createClient } from '@supabase/supabase-js';
 /**
  * POST /api/auth/forgot-password
  * Generate a password recovery link and email it to the user.
- * Body: { email: string, redirectTo: string }
+ * Extracts the token_hash from Supabase's action link and builds
+ * a direct reset URL - bypasses Supabase redirect URL config entirely.
  */
 export async function POST(request: NextRequest) {
   try {
@@ -27,27 +28,39 @@ export async function POST(request: NextRequest) {
       serviceRoleKey
     );
 
-    // Use admin generateLink to bypass Supabase email rate limits
     const { data, error } = await adminClient.auth.admin.generateLink({
       type: 'recovery',
       email: email.trim(),
-      options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://carolina-hq.vercel.app'}/auth/callback?next=/reset-password`,
-      },
     });
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
-    const actionLink = data?.properties?.action_link || null;
+    // Extract token_hash from the action link query string
+    const actionLink = data?.properties?.action_link || '';
+    let tokenHash = '';
+    try {
+      const url = new URL(actionLink);
+      tokenHash = url.searchParams.get('token') || '';
+    } catch {
+      // fallback: couldn't parse action link
+    }
+
+    if (!tokenHash) {
+      return NextResponse.json({ error: 'Failed to generate reset token' }, { status: 500 });
+    }
+
+    // Build a direct reset URL that our /reset-password page handles
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://carolina-hq.vercel.app';
+    const resetUrl = `${siteUrl}/reset-password?token_hash=${encodeURIComponent(tokenHash)}&type=recovery`;
 
     // Send the recovery email via Resend
     let emailSent = false;
     const resendKey = process.env.RESEND_API_KEY;
     const fromEmail = process.env.RESEND_FROM_EMAIL || 'noreply@dailycookie.co';
 
-    if (resendKey && actionLink) {
+    if (resendKey) {
       try {
         const res = await fetch('https://api.resend.com/emails', {
           method: 'POST',
@@ -71,7 +84,7 @@ export async function POST(request: NextRequest) {
                   We received a request to reset your password. Click the button below to choose a new one:
                 </p>
                 <div style="text-align: center; margin: 28px 0;">
-                  <a href="${actionLink}" style="display: inline-block; background: #4F6BFF; color: #fff; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600; font-size: 15px;">
+                  <a href="${resetUrl}" style="display: inline-block; background: #4F6BFF; color: #fff; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600; font-size: 15px;">
                     Reset Password
                   </a>
                 </div>
@@ -84,15 +97,15 @@ export async function POST(request: NextRequest) {
         });
         emailSent = res.ok;
       } catch {
-        // Email send failed, but we still have the action link as fallback
+        // Email send failed, but we still have the reset URL as fallback
       }
     }
 
     return NextResponse.json({
       ok: true,
       email_sent: emailSent,
-      // Include action_link as fallback in case email doesn't arrive
-      action_link: actionLink,
+      // Include direct reset link as fallback
+      action_link: resetUrl,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to generate reset link';
