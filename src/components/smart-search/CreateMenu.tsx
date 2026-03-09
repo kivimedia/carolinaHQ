@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import CreateBoardModal from '@/components/board/CreateBoardModal';
 
 interface CreateMenuProps {
   boardId: string;
@@ -10,6 +11,7 @@ interface CreateMenuProps {
 
 export default function CreateMenu({ boardId, onCreateCard }: CreateMenuProps) {
   const [open, setOpen] = useState(false);
+  const [showBoardModal, setShowBoardModal] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -45,7 +47,7 @@ export default function CreateMenu({ boardId, onCreateCard }: CreateMenuProps) {
         </svg>
       ),
       onClick: () => {
-        router.push('/boards/new');
+        setShowBoardModal(true);
         setOpen(false);
       },
     },
@@ -64,31 +66,38 @@ export default function CreateMenu({ boardId, onCreateCard }: CreateMenuProps) {
   ];
 
   return (
-    <div ref={menuRef} className="relative">
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 px-3 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-medium rounded-lg transition-colors font-body shadow-sm"
-      >
-        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-        </svg>
-        Create
-      </button>
+    <>
+      <div ref={menuRef} className="relative">
+        <button
+          onClick={() => setOpen(!open)}
+          className="flex items-center gap-1.5 px-3 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-medium rounded-lg transition-colors font-body shadow-sm"
+        >
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          Create
+        </button>
 
-      {open && (
-        <div className="absolute top-full right-0 mt-1 w-48 bg-white dark:bg-dark-surface border border-cream-dark dark:border-slate-700 rounded-xl shadow-modal z-50 py-1">
-          {items.map((item) => (
-            <button
-              key={item.label}
-              onClick={item.onClick}
-              className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-navy dark:text-slate-200 hover:bg-cream-dark/50 dark:hover:bg-slate-800/50 transition-colors font-body"
-            >
-              <span className="text-navy/40 dark:text-slate-500">{item.icon}</span>
-              {item.label}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
+        {open && (
+          <div className="absolute top-full right-0 mt-1 w-48 bg-white dark:bg-dark-surface border border-cream-dark dark:border-slate-700 rounded-xl shadow-modal z-50 py-1">
+            {items.map((item) => (
+              <button
+                key={item.label}
+                onClick={item.onClick}
+                className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-navy dark:text-slate-200 hover:bg-cream-dark/50 dark:hover:bg-slate-800/50 transition-colors font-body"
+              >
+                <span className="text-navy/40 dark:text-slate-500">{item.icon}</span>
+                {item.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <CreateBoardModal
+        isOpen={showBoardModal}
+        onClose={() => setShowBoardModal(false)}
+      />
+    </>
   );
 }

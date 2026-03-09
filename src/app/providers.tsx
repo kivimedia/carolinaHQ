@@ -4,8 +4,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import KeyboardShortcutsProvider from '@/components/layout/KeyboardShortcutsProvider';
-import ProfilingPopup from '@/components/profiling/ProfilingPopup';
-import PageProfiler from '@/components/profiling/PageProfiler';
 import { SkinProvider } from '@/lib/skin-context';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
@@ -27,8 +25,6 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         <SkinProvider>
           <KeyboardShortcutsProvider>
             {children}
-            <PageProfiler />
-            <ProfilingPopup />
           </KeyboardShortcutsProvider>
         </SkinProvider>
       </QueryClientProvider>

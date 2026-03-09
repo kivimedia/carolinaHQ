@@ -258,25 +258,33 @@ export default async function SettingsPage() {
                 </Link>
               )}
 
-              {/* Board Permissions Card - Informational */}
-              <div className="bg-white dark:bg-dark-surface rounded-2xl border-2 border-cream-dark dark:border-slate-700 p-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-600">
-                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              {/* Board Permissions Card */}
+              {userIsAdmin && (
+                <Link
+                  href="/settings/board-permissions"
+                  className="group bg-white dark:bg-dark-surface rounded-2xl border-2 border-cream-dark dark:border-slate-700 hover:border-electric/50 p-6 transition-all duration-200"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center shrink-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-600">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                      </svg>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-navy dark:text-slate-100 font-heading font-semibold text-base mb-1">
+                        Board Permissions
+                      </h3>
+                      <p className="text-navy/50 font-body text-sm leading-relaxed">
+                        Manage board-level permissions, member roles, and column move rules.
+                      </p>
+                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-navy/20 group-hover:text-electric transition-colors mt-1 shrink-0">
+                      <polyline points="9 18 15 12 9 6" />
                     </svg>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-navy dark:text-slate-100 font-heading font-semibold text-base mb-1">
-                      Board Permissions
-                    </h3>
-                    <p className="text-navy/50 font-body text-sm leading-relaxed">
-                      Board-level permissions including member roles and column move rules are managed directly within each board&apos;s settings. Navigate to a board and open its settings to configure access.
-                    </p>
-                  </div>
-                </div>
-              </div>
+                </Link>
+              )}
             </div>
 
             {/* Balloon Business Section */}
