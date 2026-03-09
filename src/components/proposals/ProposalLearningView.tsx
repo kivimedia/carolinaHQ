@@ -36,7 +36,7 @@ export default function ProposalLearningView() {
     try {
       const res = await fetch('/api/proposals/patterns');
       const json = await res.json();
-      if (json.ok) setPatterns(json.data || []);
+      if (json.data) setPatterns(json.data);
     } catch (err) {
       console.error('Failed to fetch patterns:', err);
     } finally {
