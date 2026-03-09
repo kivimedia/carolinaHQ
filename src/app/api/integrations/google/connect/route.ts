@@ -16,7 +16,7 @@ export async function GET() {
     })).toString('base64url');
 
     const url = getAuthorizationUrl(state);
-    return NextResponse.json({ url });
+    return NextResponse.json({ data: { url } });
   } catch (err) {
     return errorResponse((err as Error).message, 500);
   }

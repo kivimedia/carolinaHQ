@@ -20,19 +20,19 @@ export const GOOGLE_SCOPES = [
 ];
 
 function getClientId(): string {
-  const id = process.env.GOOGLE_CLIENT_ID;
-  if (!id) throw new Error('GOOGLE_CLIENT_ID not set');
+  const id = process.env.GOOGLE_CALENDAR_CLIENT_ID || process.env.GOOGLE_CLIENT_ID;
+  if (!id) throw new Error('GOOGLE_CALENDAR_CLIENT_ID not set');
   return id;
 }
 
 function getClientSecret(): string {
-  const secret = process.env.GOOGLE_CLIENT_SECRET;
-  if (!secret) throw new Error('GOOGLE_CLIENT_SECRET not set');
+  const secret = process.env.GOOGLE_CALENDAR_CLIENT_SECRET || process.env.GOOGLE_CLIENT_SECRET;
+  if (!secret) throw new Error('GOOGLE_CALENDAR_CLIENT_SECRET not set');
   return secret;
 }
 
 function getRedirectUri(): string {
-  const base = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || 'http://localhost:3000';
+  const base = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || 'http://localhost:3000';
   return `${base}/api/integrations/google/callback`;
 }
 
