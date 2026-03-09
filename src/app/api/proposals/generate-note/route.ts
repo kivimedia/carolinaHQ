@@ -68,8 +68,8 @@ Keep it 2-3 sentences, warm and professional. Don't include pricing or business 
 
     const latencyMs = Date.now() - startTime;
     const note = response.content
-      .filter((block): block is { type: 'text'; text: string } => block.type === 'text')
-      .map((block) => block.text)
+      .filter((block) => block.type === 'text')
+      .map((block) => (block as { type: 'text'; text: string }).text)
       .join('');
 
     await Promise.all([

@@ -293,7 +293,7 @@ export default function FunPublicProposal({ proposalId }: FunPublicProposalProps
   const activeTotal = activeSubtotal + surchargesTotal;
 
   const handleRemoveItem = (itemId: string) => {
-    setRemovedItemIds((prev) => new Set([...prev, itemId]));
+    setRemovedItemIds((prev) => { const next = new Set(prev); next.add(itemId); return next; });
   };
 
   const handleUndoRemove = (itemId: string) => {

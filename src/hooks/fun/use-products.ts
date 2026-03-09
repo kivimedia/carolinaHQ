@@ -83,5 +83,5 @@ export function useProducts() {
 }
 
 export function useProductCategories(products: DbProduct[]) {
-  return [...new Set(products.map((p) => p.category))];
+  return Array.from(new Set(products.map((p) => p.category)));
 }

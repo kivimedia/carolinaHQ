@@ -41,6 +41,7 @@ const DEFAULTS: Record<AIActivity, { provider: AIProvider; model_id: string; tem
   lead_triage: { provider: 'anthropic', model_id: 'claude-haiku-4-5-20251001', temperature: 0.3, max_tokens: 2048 },
   follow_up_draft: { provider: 'anthropic', model_id: 'claude-sonnet-4-5-20250929', temperature: 0.6, max_tokens: 2048 },
   friendor_email: { provider: 'anthropic', model_id: 'claude-sonnet-4-5-20250929', temperature: 0.6, max_tokens: 2048 },
+  proposal_chat: { provider: 'anthropic', model_id: 'claude-sonnet-4-5-20250929', temperature: 0.8, max_tokens: 2048 },
 };
 
 function isDefaultConfig(config: AIModelConfig): boolean {

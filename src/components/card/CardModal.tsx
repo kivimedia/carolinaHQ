@@ -26,6 +26,7 @@ import CardApprovalPanel from './CardApprovalPanel';
 import LeadInfoPanel from './LeadInfoPanel';
 import DidntBookPanel from './DidntBookPanel';
 import CardProposals from './CardProposals';
+import CardMarqueeBookings from './CardMarqueeBookings';
 import ReactMarkdown from 'react-markdown';
 import { MarkdownToolbarUI } from './MarkdownToolbar';
 import { useMentionDropdown } from './useMentionDropdown';
@@ -888,6 +889,15 @@ export default function CardModal({ cardId, boardId, onClose, onRefresh, allCard
                       eventType={(card as any).event_type ?? null}
                       eventDate={(card as any).event_date ?? null}
                       venueName={(card as any).venue_name ?? null}
+                    />
+                  )}
+
+                  {/* Marquee letter bookings (lead boards) */}
+                  {isLeadBoard && (
+                    <CardMarqueeBookings
+                      cardId={cardId}
+                      clientName={card?.title}
+                      eventDate={(card as any).event_date ?? null}
                     />
                   )}
 

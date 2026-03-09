@@ -98,11 +98,11 @@ const INITIAL_PROPOSAL: BuilderProposalData = {
   galleryLayout: "grid",
 };
 
-export default function FunProposalBuilder() {
+export default function FunProposalBuilder({ proposalId: propId }: { proposalId?: string } = {}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const templateId = searchParams.get("template") || undefined;
-  const editId = searchParams.get("edit") || undefined;
+  const editId = propId || searchParams.get("edit") || undefined;
 
   const [proposal, setProposal] = useState<BuilderProposalData>(INITIAL_PROPOSAL);
   const [showPreview, setShowPreview] = useState(false);

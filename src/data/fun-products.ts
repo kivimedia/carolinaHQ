@@ -173,7 +173,7 @@ export const PRODUCTS: Product[] = [
   },
 ];
 
-export const CATEGORIES = [...new Set(PRODUCTS.map((p) => p.category))];
+export const CATEGORIES = Array.from(new Set(PRODUCTS.map((p) => p.category)));
 
 export const SAMPLE_PROPOSALS = [
   {
