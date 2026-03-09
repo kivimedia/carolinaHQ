@@ -11,7 +11,7 @@ interface SkinContextValue {
 }
 
 const SkinContext = createContext<SkinContextValue>({
-  skin: 'classic',
+  skin: 'fun',
   setSkin: () => {},
 });
 

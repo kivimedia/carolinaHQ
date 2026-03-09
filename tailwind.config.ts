@@ -49,6 +49,25 @@ const config: Config = {
           DEFAULT: '#1a1a3e',
           light: '#2d2d5e',
         },
+        // Proposal-Poppers fun mode colors
+        blush: {
+          DEFAULT: '#fdf2f8',
+          light: '#fef7fb',
+          dark: '#fce7f3',
+        },
+        gold: {
+          DEFAULT: '#d4a853',
+          light: '#f5e6c8',
+          muted: '#fef3c7',
+        },
+        emerald: {
+          DEFAULT: '#10b981',
+          light: '#d1fae5',
+        },
+        indigo: {
+          DEFAULT: '#6366f1',
+          light: '#e0e7ff',
+        },
         // Inventory-specific colors
         'inventory-bg': '#fdf2f8',
         // shadcn CSS variable colors
@@ -89,6 +108,8 @@ const config: Config = {
       fontFamily: {
         heading: ['var(--font-inter)', 'sans-serif'],
         body: ['var(--font-inter)', 'sans-serif'],
+        display: ['var(--font-playfair)', 'Georgia', 'serif'],
+        mono: ['var(--font-jetbrains)', 'JetBrains Mono', 'monospace'],
       },
       boxShadow: {
         'card': '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05)',
@@ -109,10 +130,25 @@ const config: Config = {
           from: { height: 'var(--radix-accordion-content-height)' },
           to: { height: '0' },
         },
+        'slide-in-right': {
+          from: { transform: 'translateX(100%)', opacity: '0' },
+          to: { transform: 'translateX(0)', opacity: '1' },
+        },
+        'fade-up': {
+          from: { transform: 'translateY(8px)', opacity: '0' },
+          to: { transform: 'translateY(0)', opacity: '1' },
+        },
+        'scale-in': {
+          from: { transform: 'scale(0.95)', opacity: '0' },
+          to: { transform: 'scale(1)', opacity: '1' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+        'slide-in-right': 'slide-in-right 0.3s ease-out',
+        'fade-up': 'fade-up 0.3s ease-out',
+        'scale-in': 'scale-in 0.2s ease-out',
       },
     },
   },

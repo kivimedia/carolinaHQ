@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation';
 import Sidebar from '@/components/layout/Sidebar';
 import Header from '@/components/layout/Header';
 import ProposalsPageContent from '@/components/proposals/ProposalsPageContent';
+import SkinSwitch from '@/components/SkinSwitch';
+import FunDashboard from '@/components/fun-proposals/FunDashboard';
 
 export default async function ProposalsPage() {
   const supabase = createServerSupabaseClient();
@@ -21,8 +23,15 @@ export default async function ProposalsPage() {
     <div className="flex h-screen overflow-hidden">
       <Sidebar initialBoards={boards || []} />
       <main className="flex-1 flex flex-col overflow-hidden">
-        <Header title="Proposals" />
-        <ProposalsPageContent />
+        <SkinSwitch
+          classic={
+            <>
+              <Header title="Proposals" />
+              <ProposalsPageContent />
+            </>
+          }
+          fun={<FunDashboard />}
+        />
       </main>
     </div>
   );

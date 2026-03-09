@@ -45,3 +45,14 @@ nul
 
 # google credentials
 google-credentials.json
+
+# gmail export data (raw emails, images - too large for git)
+/proposals-export/
+proposals-export.zip
+/scripts/product-images/
+/scripts/product-image-map.json
+
+# working docs
+proposal-patterns.md
+proposal-system-plan.md
+.env.prodtest

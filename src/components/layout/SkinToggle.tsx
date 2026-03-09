@@ -1,32 +1,21 @@
 'use client';
 
 import { useSkinContext, type Skin } from '@/lib/skin-context';
-import { toast } from 'sonner';
 
-const SKIN_OPTIONS: { value: Skin; label: string }[] = [
-  { value: 'classic', label: 'Classic' },
-  { value: 'fun', label: 'Fun' },
+const SKIN_OPTIONS: { value: Skin; label: string; icon: string }[] = [
+  { value: 'classic', label: 'Classic', icon: '📋' },
+  { value: 'fun', label: 'Fun', icon: '🎈' },
 ];
 
 export default function SkinToggle() {
   const { skin, setSkin } = useSkinContext();
-
-  const handleClick = (value: Skin) => {
-    if (value === 'fun') {
-      toast('Fun mode coming soon!', {
-        description: 'The playful Lovable-style UI is under construction.',
-      });
-      return;
-    }
-    setSkin(value);
-  };
 
   return (
     <div className="flex items-center gap-0.5 bg-cream-dark dark:bg-white/10 rounded-lg p-0.5">
       {SKIN_OPTIONS.map((option) => (
         <button
           key={option.value}
-          onClick={() => handleClick(option.value)}
+          onClick={() => setSkin(option.value)}
           className={`
             px-2 py-1 rounded-md text-xs font-medium transition-all
             ${skin === option.value
@@ -36,7 +25,7 @@ export default function SkinToggle() {
           `}
           title={option.label}
         >
-          {option.label}
+          {option.icon} {option.label}
         </button>
       ))}
     </div>

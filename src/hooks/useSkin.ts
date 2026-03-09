@@ -7,12 +7,12 @@ export type Skin = 'classic' | 'fun';
 const SKIN_KEY = 'cb-hq-skin';
 
 function getStoredSkin(): Skin {
-  if (typeof window === 'undefined') return 'classic';
-  return (localStorage.getItem(SKIN_KEY) as Skin) || 'classic';
+  if (typeof window === 'undefined') return 'fun';
+  return (localStorage.getItem(SKIN_KEY) as Skin) || 'fun';
 }
 
 export function useSkin() {
-  const [skin, setSkinState] = useState<Skin>('classic');
+  const [skin, setSkinState] = useState<Skin>('fun');
 
   useEffect(() => {
     setSkinState(getStoredSkin());

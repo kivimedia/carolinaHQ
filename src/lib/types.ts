@@ -728,7 +728,8 @@ export type AIActivity =
   | 'proposal_generation'
   | 'lead_triage'
   | 'follow_up_draft'
-  | 'friendor_email';
+  | 'friendor_email'
+  | 'proposal_chat';
 
 export type AIUsageStatus = 'success' | 'error' | 'cancelled' | 'budget_blocked' | 'rate_limited';
 
@@ -892,6 +893,7 @@ export interface ChatContext {
   recent_activity?: { event: string; detail: string; when: string }[];
   map_board_context?: string;
   wiki_context?: string;
+  proposal_context?: string;
 }
 
 // ============================================================================

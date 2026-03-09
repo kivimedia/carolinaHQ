@@ -5,6 +5,7 @@ import { resolveModelWithFallback } from './model-resolver';
 import { logUsage } from './cost-tracker';
 import { canMakeAICall } from './budget-checker';
 import { getSystemPrompt } from './prompt-templates';
+import { buildProposalContext } from './proposal-context';
 import type {
   ChatScope,
   ChatMessage,
@@ -595,6 +596,11 @@ export function formatContextForPrompt(context: ChatContext): string {
     parts.push(`\n${context.wiki_context}`);
   }
 
+  // Proposal system knowledge (products, templates, pricing)
+  if (context.proposal_context) {
+    parts.push(`\n${context.proposal_context}`);
+  }
+
   return parts.join('\n');
 }
 
@@ -685,6 +691,16 @@ export async function sendChatMessage(
     }
   } catch {
     // Wiki search is best-effort — don't fail the chat
+  }
+
+  // 4c. Enrich with proposal knowledge (all bots get product/pricing awareness)
+  try {
+    const proposalCtx = await buildProposalContext(supabase);
+    if (proposalCtx) {
+      context.proposal_context = proposalCtx;
+    }
+  } catch {
+    // Proposal context is best-effort
   }
 
   // 5. Build messages array

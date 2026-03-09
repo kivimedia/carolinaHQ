@@ -25,6 +25,7 @@ import ClientBrainPanel from '@/components/client/ClientBrainPanel';
 import CardApprovalPanel from './CardApprovalPanel';
 import LeadInfoPanel from './LeadInfoPanel';
 import DidntBookPanel from './DidntBookPanel';
+import CardProposals from './CardProposals';
 import ReactMarkdown from 'react-markdown';
 import { MarkdownToolbarUI } from './MarkdownToolbar';
 import { useMentionDropdown } from './useMentionDropdown';
@@ -874,6 +875,19 @@ export default function CardModal({ cardId, boardId, onClose, onRefresh, allCard
                       reason={(card as any).didnt_book_reason ?? null}
                       subReason={(card as any).didnt_book_sub_reason ?? null}
                       onUpdate={(updates) => updateCard(updates as any)}
+                    />
+                  )}
+
+                  {/* Proposals linked to this card (lead boards) */}
+                  {isLeadBoard && (
+                    <CardProposals
+                      cardId={cardId}
+                      clientName={card?.title}
+                      clientEmail={(card as any).client_email ?? null}
+                      clientPhone={(card as any).client_phone ?? null}
+                      eventType={(card as any).event_type ?? null}
+                      eventDate={(card as any).event_date ?? null}
+                      venueName={(card as any).venue_name ?? null}
                     />
                   )}
 
