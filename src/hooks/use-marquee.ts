@@ -129,7 +129,7 @@ export function useMarqueeBookings(setId?: string) {
       let query = supabase
         .from('marquee_bookings')
         .select('*')
-        .not('status', 'in', '("cancelled","returned")')
+        .not('status', 'in', '(cancelled,returned)')
         .order('event_date', { ascending: true });
 
       if (setId) {
