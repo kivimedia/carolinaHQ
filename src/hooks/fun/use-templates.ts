@@ -41,6 +41,7 @@ export interface DbTemplate {
 export function useTemplates() {
   return useQuery({
     queryKey: ['templates'],
+    retry: 1,
     queryFn: async (): Promise<DbTemplate[]> => {
       const supabase = createBrowserSupabaseClient();
       const { data, error } = await supabase

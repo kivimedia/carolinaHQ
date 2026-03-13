@@ -38,6 +38,7 @@ export interface DbProduct {
 export function useProducts() {
   return useQuery({
     queryKey: ['products'],
+    retry: 1,
     queryFn: async (): Promise<DbProduct[]> => {
       const supabase = createBrowserSupabaseClient();
       const { data, error } = await supabase

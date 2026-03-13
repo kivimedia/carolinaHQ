@@ -25,7 +25,7 @@ import {
 
 export default function FunTemplates() {
   const router = useRouter();
-  const { data: templates = [], isLoading } = useTemplates();
+  const { data: templates = [], isLoading, isError } = useTemplates();
   const deleteTemplate = useDeleteTemplate();
   const duplicateTemplate = useDuplicateTemplate();
   const saveTemplate = useSaveTemplate();
@@ -67,9 +67,13 @@ export default function FunTemplates() {
         </Button>
       </div>
 
-      {isLoading ? (
+      {isLoading && !isError ? (
         <div className="flex items-center justify-center p-12">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      ) : isError ? (
+        <div className="rounded-xl border-2 border-dashed border-destructive/30 p-12 text-center">
+          <p className="text-sm text-destructive">Failed to load templates. Please refresh the page.</p>
         </div>
       ) : (
         <div className="grid gap-6 lg:grid-cols-3">

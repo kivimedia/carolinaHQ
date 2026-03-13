@@ -49,6 +49,7 @@ export function useUserSettings() {
   return useQuery({
     queryKey: ['user-settings', user?.id],
     enabled: !!user,
+    retry: 1,
     queryFn: async (): Promise<UserSettings> => {
       const supabase = createBrowserSupabaseClient();
       const { data, error } = await supabase

@@ -35,7 +35,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 export default function FunProducts() {
   const supabase = createClient();
-  const { data: products = [], isLoading } = useProducts();
+  const { data: products = [], isLoading, isError } = useProducts();
   const { data: proposals = [] } = useProposals();
   const categories = useProductCategories(products);
   const queryClient = useQueryClient();
@@ -122,10 +122,20 @@ export default function FunProducts() {
     setNewCategoryName("");
   };
 
-  if (isLoading) {
+  if (isLoading && !isError) {
     return (
       <div className="flex items-center justify-center p-20">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex-1 overflow-auto p-6 lg:p-8">
+        <div className="rounded-xl border-2 border-dashed border-destructive/30 p-12 text-center">
+          <p className="text-sm text-destructive">Failed to load products. Please refresh the page.</p>
+        </div>
       </div>
     );
   }

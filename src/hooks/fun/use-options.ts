@@ -36,6 +36,7 @@ export interface DbOption {
 export function useOptions() {
   return useQuery({
     queryKey: ['options'],
+    retry: 1,
     queryFn: async (): Promise<DbOption[]> => {
       const supabase = createBrowserSupabaseClient();
       const { data: options, error } = await supabase

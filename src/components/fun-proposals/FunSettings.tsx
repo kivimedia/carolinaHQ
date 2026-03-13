@@ -28,7 +28,7 @@ function DynamicIcon({ name, ...props }: { name: string } & Omit<LucideProps, 'r
 
 export default function FunSettings() {
   const supabase = createClient();
-  const { data: settings, isLoading } = useUserSettings();
+  const { data: settings, isLoading, isError } = useUserSettings();
   const saveSettings = useSaveUserSettings();
 
   const [businessName, setBusinessName] = useState("");
@@ -108,10 +108,20 @@ export default function FunSettings() {
     toast({ title: "Logo removed" });
   };
 
-  if (isLoading) {
+  if (isLoading && !isError) {
     return (
       <div className="flex items-center justify-center p-12">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex-1 overflow-auto p-6 lg:p-8">
+        <div className="rounded-xl border-2 border-dashed border-destructive/30 p-12 text-center">
+          <p className="text-sm text-destructive">Failed to load settings. Please refresh the page.</p>
+        </div>
       </div>
     );
   }

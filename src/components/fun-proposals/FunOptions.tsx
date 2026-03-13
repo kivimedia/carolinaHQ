@@ -21,7 +21,7 @@ import { useUserSettings } from "@/hooks/fun/use-user-settings";
 
 export default function FunOptions() {
   const router = useRouter();
-  const { data: options = [], isLoading } = useOptions();
+  const { data: options = [], isLoading, isError } = useOptions();
   const { data: settings } = useUserSettings();
   const deleteOption = useDeleteOption();
   const saveOption = useSaveOption();
@@ -59,9 +59,13 @@ export default function FunOptions() {
         </Button>
       </div>
 
-      {isLoading ? (
+      {isLoading && !isError ? (
         <div className="flex items-center justify-center p-12">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      ) : isError ? (
+        <div className="rounded-xl border-2 border-dashed border-destructive/30 p-12 text-center">
+          <p className="text-sm text-destructive">Failed to load options. Please refresh the page.</p>
         </div>
       ) : options.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-border p-12 text-center">
