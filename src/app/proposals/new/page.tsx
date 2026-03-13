@@ -1,7 +1,9 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Sidebar from '@/components/layout/Sidebar';
+import SkinSwitch from '@/components/SkinSwitch';
 import FunProposalBuilder from '@/components/fun-proposals/FunProposalBuilder';
+import ClassicProposalBuilder from '@/components/classic-proposals/ClassicProposalBuilder';
 
 export default async function NewProposalPage() {
   const supabase = createServerSupabaseClient();
@@ -20,7 +22,10 @@ export default async function NewProposalPage() {
     <div className="flex h-screen overflow-hidden">
       <Sidebar initialBoards={boards || []} />
       <main className="flex-1 flex flex-col overflow-hidden">
-        <FunProposalBuilder />
+        <SkinSwitch
+          classic={<ClassicProposalBuilder />}
+          fun={<FunProposalBuilder />}
+        />
       </main>
     </div>
   );

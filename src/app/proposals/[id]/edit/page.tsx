@@ -1,7 +1,9 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Sidebar from '@/components/layout/Sidebar';
+import SkinSwitch from '@/components/SkinSwitch';
 import FunProposalBuilder from '@/components/fun-proposals/FunProposalBuilder';
+import ClassicProposalBuilder from '@/components/classic-proposals/ClassicProposalBuilder';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -25,7 +27,10 @@ export default async function EditProposalPage({ params }: Props) {
     <div className="flex h-screen overflow-hidden">
       <Sidebar initialBoards={boards || []} />
       <main className="flex-1 flex flex-col overflow-hidden">
-        <FunProposalBuilder proposalId={id} />
+        <SkinSwitch
+          classic={<ClassicProposalBuilder proposalId={id} />}
+          fun={<FunProposalBuilder proposalId={id} />}
+        />
       </main>
     </div>
   );

@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Save, Eye, Send, ArrowLeft, Package, X, History } from "lucide-react";
+import { Save, Eye, Send, ArrowLeft, Package, X, History, BookTemplate } from "lucide-react";
 import { Button } from "@/components/ui-shadcn/button";
 import { toast } from "@/hooks/fun/use-toast";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui-shadcn/resizable";
@@ -13,7 +13,7 @@ import ProposalPreview from "@/components/fun-proposals/proposal/ProposalPreview
 import { DbProduct, useProducts } from "@/hooks/fun/use-products";
 import { useSaveProposal, useProposal } from "@/hooks/fun/use-proposals";
 import { usePricingRules, calculateDeliveryFee } from "@/hooks/fun/use-pricing-rules";
-import { useTemplate } from "@/hooks/fun/use-templates";
+import { useTemplate, useSaveTemplate } from "@/hooks/fun/use-templates";
 import { useSaveRevision, useRevisions } from "@/hooks/fun/use-revisions";
 import { useOptions } from "@/hooks/fun/use-options";
 import { useUserSettings } from "@/hooks/fun/use-user-settings";
@@ -123,6 +123,7 @@ export default function FunProposalBuilder({ proposalId: propId }: { proposalId?
 
   const previewPanelRef = useRef<ImperativePanelHandle>(null);
   const saveProposal = useSaveProposal();
+  const saveTemplate = useSaveTemplate();
   const saveRevision = useSaveRevision();
   const { data: pricingRules = [] } = usePricingRules();
   const { data: products = [] } = useProducts();
@@ -477,6 +478,27 @@ export default function FunProposalBuilder({ proposalId: propId }: { proposalId?
     return id;
   };
 
+  const handleSaveAsTemplate = async () => {
+    const templateName = proposal.clientName
+      ? `Template from ${proposal.clientName}`
+      : `Template ${new Date().toLocaleDateString()}`;
+    await saveTemplate.mutateAsync({
+      name: templateName,
+      description: proposal.eventType || "",
+      default_personal_note: proposal.personalNote,
+      default_notes: proposal.notes,
+      default_line_items: proposal.lineItems.map((item) => ({
+        product_id: item.product.id,
+        product_name: item.product.name,
+        selected_size: item.selectedSize,
+        selected_color: item.selectedColor,
+        quantity: item.quantity,
+        unit_price: item.unitPrice,
+      })),
+    });
+    toast({ title: "Template saved!", description: `"${templateName}" is now available as a template.` });
+  };
+
   const canvasProps = {
     proposal,
     onUpdate: handleUpdate,
@@ -543,6 +565,18 @@ export default function FunProposalBuilder({ proposalId: propId }: { proposalId?
             >
               <History className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">v{revisions.length}</span>
+            </Button>
+          )}
+          {proposalId && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-1 px-2 text-xs"
+              onClick={handleSaveAsTemplate}
+              disabled={saveTemplate.isPending}
+            >
+              <BookTemplate className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">{saveTemplate.isPending ? "Saving..." : "Save as Template"}</span>
             </Button>
           )}
           <Button

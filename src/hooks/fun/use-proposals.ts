@@ -27,9 +27,11 @@ export interface DbProposal {
   total_override: number | null;
   personal_note: string | null;
   template_name: string | null;
+  slug: string | null;
   created_at: string | null;
   updated_at: string | null;
   sent_at: string | null;
+  accepted_at: string | null;
   surcharges: unknown;
   discounts: unknown;
 }
@@ -208,6 +210,28 @@ export function useProposal(id: string | undefined) {
         proposal: proposal as DbProposal,
         lineItems: (items || []) as DbLineItem[],
       };
+    },
+  });
+}
+
+export function useDeleteProposal() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (proposalId: string) => {
+      const supabase = createBrowserSupabaseClient();
+      // Delete line items first
+      await supabase.from('proposal_line_items').delete().eq('proposal_id', proposalId);
+      // Delete the proposal
+      const { error } = await supabase.from('proposals').delete().eq('id', proposalId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['proposals'] });
+      toast.success('Proposal deleted');
+    },
+    onError: (e) => {
+      toast.error(`Error deleting proposal: ${e.message}`);
     },
   });
 }

@@ -13,6 +13,7 @@ export interface DbProductImage {
   image_url: string;
   is_primary: boolean;
   display_order: number;
+  nobg_url: string | null;
 }
 
 export interface DbProduct {
@@ -41,7 +42,7 @@ export function useProducts() {
       const supabase = createBrowserSupabaseClient();
       const { data, error } = await supabase
         .from('products')
-        .select('*, product_images!left(id, image_url, is_primary, display_order)')
+        .select('*, product_images!left(id, image_url, is_primary, display_order, nobg_url)')
         .eq('is_active', true)
         .order('display_order');
 
@@ -55,6 +56,7 @@ export function useProducts() {
             image_url: img.image_url,
             is_primary: img.is_primary || false,
             display_order: img.display_order || 0,
+            nobg_url: img.nobg_url || null,
           }));
 
         const primaryImage = allImages.find((img) => img.is_primary);

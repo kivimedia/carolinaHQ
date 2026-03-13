@@ -6,11 +6,12 @@ import Link from "next/link";
 import { Badge } from "@/components/ui-shadcn/badge";
 import { Button } from "@/components/ui-shadcn/button";
 import { Input } from "@/components/ui-shadcn/input";
-import { Loader2, Pencil, Settings2, Plus, Trash2, Check, X } from "lucide-react";
+import { Loader2, Pencil, Settings2, Plus, Trash2, Check, X, Image as ImageIcon } from "lucide-react";
 import { useProducts, useProductCategories } from "@/hooks/fun/use-products";
 import { useProposals } from "@/hooks/fun/use-proposals";
+import MediaLibrary from "@/components/fun-proposals/media/MediaLibrary";
 import { createClient } from '@/lib/supabase/client';
-import { toast } from "@/hooks/fun/use-toast";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -19,6 +20,17 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui-shadcn/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui-shadcn/alert-dialog";
 import { useQueryClient } from "@tanstack/react-query";
 
 export default function FunProducts() {
@@ -29,15 +41,40 @@ export default function FunProducts() {
   const queryClient = useQueryClient();
 
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"products" | "media">("products");
   const [manageCategoriesOpen, setManageCategoriesOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
   const [newCategoryName, setNewCategoryName] = useState("");
   const [saving, setSaving] = useState(false);
+  const [deletingProductId, setDeletingProductId] = useState<string | null>(null);
 
-  const acceptedCount = proposals.filter((p) => p.status === "accepted").length;
-  const sentOrBeyond = proposals.filter((p) => ["sent", "viewed", "accepted", "rejected"].includes(p.status)).length;
-  const overallConversion = sentOrBeyond > 0 ? Math.round((acceptedCount / sentOrBeyond) * 100) : 0;
+  const handleDeleteProduct = async (productId: string, productName: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDeletingProductId(productId);
+    try {
+      // Delete product images first
+      const { error: imgErr } = await supabase
+        .from("product_images")
+        .delete()
+        .eq("product_id", productId);
+      if (imgErr) throw imgErr;
+
+      const { error } = await supabase
+        .from("products")
+        .delete()
+        .eq("id", productId);
+      if (error) throw error;
+
+      await queryClient.invalidateQueries({ queryKey: ["products"] });
+      toast.success(`"${productName}" has been removed.`);
+    } catch (err: any) {
+      toast.error(`Error deleting product: ${err.message}`);
+    } finally {
+      setDeletingProductId(null);
+    }
+  };
 
   const filteredProducts = activeCategory
     ? products.filter((p) => p.category === activeCategory)
@@ -56,11 +93,11 @@ export default function FunProducts() {
         .eq("category", oldName);
       if (error) throw error;
       await queryClient.invalidateQueries({ queryKey: ["products"] });
-      toast({ title: "Category renamed", description: `"${oldName}" -> "${newName.trim()}"` });
+      toast.success(`Category renamed: "${oldName}" -> "${newName.trim()}"`);
       setEditingCategory(null);
       if (activeCategory === oldName) setActiveCategory(newName.trim());
     } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast.error(err.message);
     } finally {
       setSaving(false);
     }
@@ -69,26 +106,19 @@ export default function FunProducts() {
   const handleDeleteCategory = async (categoryName: string) => {
     const count = products.filter((p) => p.category === categoryName).length;
     if (count > 0) {
-      toast({
-        title: "Can't delete",
-        description: `"${categoryName}" still has ${count} product${count > 1 ? "s" : ""}. Move or delete them first.`,
-        variant: "destructive",
-      });
+      toast.error(`"${categoryName}" still has ${count} product${count > 1 ? "s" : ""}. Move or delete them first.`);
       return;
     }
-    toast({ title: "Category removed", description: `"${categoryName}" has been removed.` });
+    toast.success(`"${categoryName}" has been removed.`);
   };
 
   const handleAddCategory = () => {
     if (!newCategoryName.trim()) return;
     if (categories.includes(newCategoryName.trim())) {
-      toast({ title: "Already exists", description: `"${newCategoryName.trim()}" is already a category.`, variant: "destructive" });
+      toast.error(`"${newCategoryName.trim()}" is already a category.`);
       return;
     }
-    toast({
-      title: "Category ready",
-      description: `Create a product with category "${newCategoryName.trim()}" to see it appear.`,
-    });
+    toast(`Create a product with category "${newCategoryName.trim()}" to see it appear.`);
     setNewCategoryName("");
   };
 
@@ -106,7 +136,7 @@ export default function FunProducts() {
         <div>
           <h1 className="font-display text-3xl font-bold text-foreground">Product Catalog</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {products.length} products · Manage your balloon decor products and pricing
+            {products.length} products - Manage your balloon decor products and pricing
           </p>
         </div>
         <Button
@@ -120,6 +150,35 @@ export default function FunProducts() {
         </Button>
       </div>
 
+      {/* Main Tabs: Products / Media */}
+      <div className="mb-6 flex items-center gap-1 rounded-lg bg-muted p-1 w-fit">
+        <button
+          onClick={() => setActiveTab("products")}
+          className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+            activeTab === "products"
+              ? "bg-card text-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          Products
+        </button>
+        <button
+          onClick={() => setActiveTab("media")}
+          className={`flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+            activeTab === "media"
+              ? "bg-card text-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          <ImageIcon className="h-3.5 w-3.5" />
+          Media
+        </button>
+      </div>
+
+      {activeTab === "media" ? (
+        <MediaLibrary products={products} />
+      ) : (
+      <>
       {/* Category Tabs */}
       <div className="mb-6 flex flex-wrap items-center gap-2">
         <button
@@ -154,7 +213,7 @@ export default function FunProducts() {
       <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
         <AnimatePresence mode="popLayout">
           {filteredProducts.map((product, i) => (
-            <Link key={product.id} href={`/products/${product.id}/edit`} className="block">
+            <Link key={product.id} href={`/proposals/products/${product.id}/edit`} className="block">
               <motion.div
                 layout
                 initial={{ opacity: 0, y: 20 }}
@@ -172,7 +231,35 @@ export default function FunProducts() {
                   <div className="absolute bottom-3 left-3">
                     <Badge className="bg-card/90 text-foreground backdrop-blur-sm">{product.category}</Badge>
                   </div>
-                  <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="absolute top-3 right-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <button
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                          className="flex h-8 w-8 items-center justify-center rounded-full bg-destructive/90 text-destructive-foreground shadow-md backdrop-blur-sm hover:bg-destructive"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete &quot;{product.name}&quot;?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This will permanently remove this product and all its images. This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            onClick={(e) => handleDeleteProduct(product.id, product.name, e)}
+                          >
+                            {deletingProductId === product.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-card/90 text-foreground shadow-md backdrop-blur-sm">
                       <Pencil className="h-3.5 w-3.5" />
                     </div>
@@ -323,6 +410,8 @@ export default function FunProducts() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      </>
+      )}
     </div>
   );
 }

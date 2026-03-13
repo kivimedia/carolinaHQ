@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Save, Trash2, Loader2, DollarSign, GripVertical } from "lucide-react";
+import { ArrowLeft, Save, Trash2, Loader2, DollarSign, GripVertical, ImagePlus, X } from "lucide-react";
 import { Button } from "@/components/ui-shadcn/button";
 import { Input } from "@/components/ui-shadcn/input";
 import { Textarea } from "@/components/ui-shadcn/textarea";
@@ -11,6 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useOption, useSaveOption, type OptionItem } from "@/hooks/fun/use-options";
 import { useProducts, type DbProduct } from "@/hooks/fun/use-products";
 import { useUserSettings } from "@/hooks/fun/use-user-settings";
+import { createClient } from "@/lib/supabase/client";
+import { toast } from "sonner";
 import ProductSidebar from "@/components/fun-proposals/proposal/ProductSidebar";
 
 interface FunOptionEditorProps {
@@ -28,6 +30,7 @@ interface EditableItem {
 
 export default function FunOptionEditor({ optionId }: FunOptionEditorProps) {
   const router = useRouter();
+  const supabase = createClient();
   const { data: option, isLoading } = useOption(optionId);
   const { data: products = [] } = useProducts();
   const { data: settings } = useUserSettings();
@@ -38,6 +41,8 @@ export default function FunOptionEditor({ optionId }: FunOptionEditorProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [displayPrice, setDisplayPrice] = useState(0);
+  const [imageUrl, setImageUrl] = useState("");
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [items, setItems] = useState<EditableItem[]>([]);
   const [initialized, setInitialized] = useState(false);
   const [dragOver, setDragOver] = useState(false);
@@ -47,6 +52,7 @@ export default function FunOptionEditor({ optionId }: FunOptionEditorProps) {
       setName(option.name);
       setDescription(option.description);
       setDisplayPrice(option.display_price);
+      setImageUrl(option.image_url || "");
       setItems(
         option.items.map((i) => ({
           product_id: i.product_id,
@@ -99,12 +105,32 @@ export default function FunOptionEditor({ optionId }: FunOptionEditorProps) {
     }
   };
 
+  const handleImageUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setUploadingImage(true);
+    try {
+      const file = files[0];
+      const ext = file.name.split(".").pop();
+      const path = `option-images/${crypto.randomUUID()}.${ext}`;
+      const { error } = await supabase.storage.from("product-images").upload(path, file);
+      if (error) throw error;
+      const { data: urlData } = supabase.storage.from("product-images").getPublicUrl(path);
+      setImageUrl(urlData.publicUrl);
+      toast.success("Image uploaded");
+    } catch (err: any) {
+      toast.error(`Upload failed: ${err.message}`);
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   const handleSave = async () => {
     await saveOption.mutateAsync({
       id: optionId,
       name,
       description,
       display_price: displayPrice,
+      image_url: imageUrl,
       items,
     });
     router.push("/options");
@@ -159,6 +185,41 @@ export default function FunOptionEditor({ optionId }: FunOptionEditorProps) {
                 <div className="space-y-2">
                   <Label>Option Name</Label>
                   <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Gold Package" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Cover Image</Label>
+                  <div className="flex items-center gap-3">
+                    {imageUrl ? (
+                      <div className="relative group">
+                        <div className="flex h-20 w-32 items-center justify-center overflow-hidden rounded-lg border bg-background">
+                          <img src={imageUrl} alt="Option cover" className="max-h-full max-w-full object-cover" />
+                        </div>
+                        <button
+                          onClick={() => setImageUrl("")}
+                          className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-destructive text-destructive-foreground opacity-0 transition-opacity group-hover:opacity-100"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ) : (
+                      <label className="flex h-20 w-32 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-border text-muted-foreground transition-colors hover:border-primary hover:text-primary">
+                        {uploadingImage ? (
+                          <Loader2 className="h-5 w-5 animate-spin" />
+                        ) : (
+                          <>
+                            <ImagePlus className="mb-1 h-5 w-5" />
+                            <span className="text-xs">Upload image</span>
+                          </>
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => handleImageUpload(e.target.files)}
+                        />
+                      </label>
+                    )}
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label>Description</Label>

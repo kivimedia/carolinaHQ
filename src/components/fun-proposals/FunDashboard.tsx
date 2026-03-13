@@ -3,16 +3,27 @@
 import { useState, lazy, Suspense } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Plus, Send, Clock, CheckCircle2, AlertCircle, Sparkles, TrendingUp, FileText, Loader2, Check } from "lucide-react";
+import { Plus, Send, Clock, CheckCircle2, AlertCircle, Sparkles, TrendingUp, FileText, Loader2, Check, Trash2 } from "lucide-react";
 import dynamicIconImports from "lucide-react/dynamicIconImports";
 import type { LucideProps } from "lucide-react";
 import { Button } from "@/components/ui-shadcn/button";
 import { Badge } from "@/components/ui-shadcn/badge";
-import { useProposals } from "@/hooks/fun/use-proposals";
+import { useProposals, useDeleteProposal } from "@/hooks/fun/use-proposals";
 import { useAcceptProposal } from "@/hooks/fun/use-accept-proposal";
 import { useTags, useAllProposalTagAssignments } from "@/hooks/fun/use-tags";
 import { formatDistanceToNow } from "date-fns";
 import InlineChatPanel from "@/components/fun-proposals/chat/InlineChatPanel";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui-shadcn/alert-dialog";
 
 function DynIcon({ name, ...props }: { name: string } & Omit<LucideProps, 'ref'>) {
   const iconName = name as keyof typeof dynamicIconImports;
@@ -46,6 +57,7 @@ export default function FunDashboard() {
   const [activeFilter, setActiveFilter] = useState<string>("All");
   const { data: proposals = [], isLoading } = useProposals();
   const acceptProposal = useAcceptProposal();
+  const deleteProposal = useDeleteProposal();
   const { data: allTags = [] } = useTags();
   const { data: tagAssignments = {} } = useAllProposalTagAssignments();
 
@@ -258,6 +270,42 @@ export default function FunDashboard() {
                           <Check className="h-3 w-3" /> Mark Won
                         </Button>
                       )}
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="gap-1 text-xs text-destructive opacity-0 transition-opacity group-hover:opacity-100"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                            }}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete this proposal?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This will permanently delete the proposal for &quot;{proposal.client_name || "Untitled"}&quot;. This cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                deleteProposal.mutate(proposal.id);
+                              }}
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                       <Button variant="outline" size="sm" className="opacity-0 transition-opacity group-hover:opacity-100">
                         Review →
                       </Button>

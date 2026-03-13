@@ -12,6 +12,7 @@ import {
   ChevronLeft,
 } from 'lucide-react';
 import ChatPanel from './chat/ChatPanel';
+import { BgRemovalProvider } from '@/contexts/BackgroundRemovalContext';
 
 const NAV_ITEMS = [
   { href: '/proposals', label: 'Dashboard', icon: LayoutDashboard },
@@ -29,6 +30,7 @@ export default function FunAppLayout({ children }: FunAppLayoutProps) {
   const pathname = usePathname();
 
   return (
+    <BgRemovalProvider>
     <div className="flex h-full overflow-hidden">
       {/* Fun sidebar nav */}
       <nav className="hidden md:flex w-52 flex-col border-r border-border bg-card">
@@ -78,5 +80,6 @@ export default function FunAppLayout({ children }: FunAppLayoutProps) {
       {/* Chat FAB */}
       <ChatPanel />
     </div>
+    </BgRemovalProvider>
   );
 }

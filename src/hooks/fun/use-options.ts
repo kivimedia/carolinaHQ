@@ -25,6 +25,7 @@ export interface DbOption {
   is_active: boolean;
   display_order: number;
   user_id: string | null;
+  image_url: string;
   created_at: string;
   updated_at: string;
   items: OptionItem[];
@@ -58,6 +59,7 @@ export function useOptions() {
           display_price: opt.display_price || 0,
           is_active: opt.is_active ?? true,
           display_order: opt.display_order || 0,
+          image_url: opt.image_url || '',
           items: optItems,
           inner_total,
         } as DbOption;
@@ -96,6 +98,7 @@ export function useOption(id: string | undefined) {
         display_price: opt.display_price || 0,
         is_active: opt.is_active ?? true,
         display_order: opt.display_order || 0,
+        image_url: opt.image_url || '',
         items: optItems,
         inner_total,
       } as DbOption;
@@ -114,6 +117,7 @@ export function useSaveOption() {
       description: string;
       display_price: number;
       is_active?: boolean;
+      image_url?: string;
       items: Array<{
         product_id: string | null;
         product_name: string;

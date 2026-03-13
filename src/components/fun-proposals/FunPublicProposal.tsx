@@ -120,6 +120,7 @@ export default function FunPublicProposal({ proposalId }: FunPublicProposalProps
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [accepted, setAccepted] = useState(false);
+  const [alreadyAccepted, setAlreadyAccepted] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -135,6 +136,11 @@ export default function FunPublicProposal({ proposalId }: FunPublicProposalProps
         setNotFound(true);
         setLoading(false);
         return;
+      }
+
+      // Check if already accepted
+      if ((p as any).status === "accepted") {
+        setAlreadyAccepted(true);
       }
 
       const { data: items } = await supabase
@@ -153,22 +159,47 @@ export default function FunPublicProposal({ proposalId }: FunPublicProposalProps
           .in("id", selectedOptionIds);
 
         if (opts) {
+          // Collect all product_ids from option items to load images
+          const allProductIds: string[] = [];
+          const optItemsByOpt: Record<string, any[]> = {};
+
           for (const opt of opts) {
             const { data: optItems } = await supabase
               .from("proposal_option_items")
               .select("*")
               .eq("option_id", opt.id)
               .order("display_order");
+            optItemsByOpt[opt.id] = optItems || [];
+            for (const i of (optItems || [])) {
+              if (i.product_id) allProductIds.push(i.product_id);
+            }
+          }
 
+          // Load primary images for these products
+          let productImageMap: Record<string, string> = {};
+          if (allProductIds.length > 0) {
+            const { data: pImages } = await supabase
+              .from("product_images")
+              .select("product_id, image_url, is_primary")
+              .in("product_id", Array.from(new Set(allProductIds)))
+              .eq("is_primary", true);
+            if (pImages) {
+              for (const img of pImages) {
+                productImageMap[img.product_id] = img.image_url;
+              }
+            }
+          }
+
+          for (const opt of opts) {
             loadedOptions.push({
               id: opt.id,
               name: opt.name,
               description: opt.description,
               display_price: opt.display_price || 0,
-              items: (optItems || []).map((i: any) => ({
+              items: (optItemsByOpt[opt.id] || []).map((i: any) => ({
                 id: i.id,
                 product_name: i.product_name,
-                product_image: null,
+                product_image: productImageMap[i.product_id] || null,
                 selected_size: i.selected_size,
                 selected_color: i.selected_color,
                 quantity: i.quantity || 1,
@@ -307,6 +338,15 @@ export default function FunPublicProposal({ proposalId }: FunPublicProposalProps
   return (
     <div className="min-h-screen bg-muted/30 py-8 px-4">
       <div className="mx-auto w-full max-w-lg rounded-xl bg-card shadow-2xl ring-1 ring-border">
+        {/* Accepted Banner */}
+        {alreadyAccepted && (
+          <div className="flex items-center justify-center gap-2 rounded-t-xl bg-emerald-50 px-4 py-3 dark:bg-emerald-950/30">
+            <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+            <span className="text-sm font-medium text-emerald-700 dark:text-emerald-400">
+              This proposal has been accepted
+            </span>
+          </div>
+        )}
         {/* Cover */}
         <div className="p-10 text-center">
           {ownerSettings?.logo_url ? (

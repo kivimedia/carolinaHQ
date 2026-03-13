@@ -39,6 +39,7 @@ export default function FunSettings() {
   const [surcharges, setSurcharges] = useState<Surcharge[]>([]);
   const [itemLabel, setItemLabel] = useState("designs");
   const [logoUrl, setLogoUrl] = useState("");
+  const [urlSlug, setUrlSlug] = useState("");
   const [aiMasterPrompt, setAiMasterPrompt] = useState("");
   const [allowItemRemoval, setAllowItemRemoval] = useState(true);
   const [uploadingLogo, setUploadingLogo] = useState(false);
@@ -54,6 +55,7 @@ export default function FunSettings() {
       setSurcharges(settings.surcharges || []);
       setItemLabel(settings.item_label || "designs");
       setLogoUrl(settings.logo_url || "");
+      setUrlSlug((settings as any).url_slug || "");
       setAiMasterPrompt(settings.ai_master_prompt || "");
       setAllowItemRemoval(settings.allow_item_removal !== false);
     }
@@ -202,6 +204,34 @@ export default function FunSettings() {
           </div>
           <Button className="mt-4" size="sm" onClick={handleSaveBusinessInfo} disabled={saveSettings.isPending}>
             {saveSettings.isPending ? "Saving..." : "Save Info"}
+          </Button>
+        </section>
+
+        {/* URL Slug */}
+        <section className="glass-card p-6">
+          <h2 className="mb-4 font-display text-lg font-semibold text-foreground">Public URL</h2>
+          <p className="mb-3 text-xs text-muted-foreground">
+            Set a custom URL slug for your public proposal page (e.g. &quot;carolina-balloons&quot;).
+          </p>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">/p/</span>
+            <Input
+              value={urlSlug}
+              onChange={(e) => setUrlSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
+              className="max-w-xs text-sm font-mono"
+              placeholder="your-business-name"
+            />
+          </div>
+          <Button
+            className="mt-4"
+            size="sm"
+            onClick={async () => {
+              await saveSettings.mutateAsync({ url_slug: urlSlug } as any);
+              toast({ title: "Saved", description: "URL slug updated." });
+            }}
+            disabled={saveSettings.isPending}
+          >
+            {saveSettings.isPending ? "Saving..." : "Save URL"}
           </Button>
         </section>
 

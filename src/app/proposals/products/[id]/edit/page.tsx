@@ -1,7 +1,9 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Sidebar from '@/components/layout/Sidebar';
+import SkinSwitch from '@/components/SkinSwitch';
 import FunProductEditor from '@/components/fun-proposals/FunProductEditor';
+import ClassicProductEditor from '@/components/classic-proposals/ClassicProductEditor';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -25,7 +27,10 @@ export default async function EditProductPage({ params }: Props) {
     <div className="flex h-screen overflow-hidden">
       <Sidebar initialBoards={boards || []} />
       <main className="flex-1 flex flex-col overflow-hidden">
-        <FunProductEditor productId={id} />
+        <SkinSwitch
+          classic={<ClassicProductEditor productId={id} />}
+          fun={<FunProductEditor productId={id} />}
+        />
       </main>
     </div>
   );
