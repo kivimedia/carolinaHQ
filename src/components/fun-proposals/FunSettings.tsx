@@ -119,7 +119,7 @@ export default function FunSettings() {
   const minimumOrderTypes = Object.keys(minimumOrders);
 
   return (
-    <div className="p-6 lg:p-8">
+    <div className="flex-1 overflow-auto p-6 lg:p-8">
       <h1 className="mb-8 font-display text-3xl font-bold text-foreground">Settings</h1>
 
       <div className="max-w-2xl space-y-8">

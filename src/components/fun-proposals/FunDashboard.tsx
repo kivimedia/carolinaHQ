@@ -85,7 +85,7 @@ export default function FunDashboard() {
   };
 
   return (
-    <div className="p-6 lg:p-8">
+    <div className="flex-1 overflow-auto p-6 lg:p-8">
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-display text-3xl font-bold text-foreground">Proposal Maker</h1>

@@ -46,7 +46,7 @@ export default function FunOptions() {
   };
 
   return (
-    <div className="p-6 lg:p-8">
+    <div className="flex-1 overflow-auto p-6 lg:p-8">
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="font-display text-3xl font-bold text-foreground">Options</h1>

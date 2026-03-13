@@ -120,7 +120,7 @@ export default function FunTemplateEditor({ templateId }: FunTemplateEditorProps
   const availableProducts = products.filter((p) => !addedProductIds.includes(p.id));
 
   return (
-    <div className="p-6 lg:p-8">
+    <div className="flex-1 overflow-auto p-6 lg:p-8">
       <div className="mb-6 flex items-center gap-4">
         <Button variant="ghost" size="sm" onClick={() => router.push("/templates")}>
           <ArrowLeft className="mr-1 h-4 w-4" /> Back
