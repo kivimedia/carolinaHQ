@@ -12,6 +12,7 @@ import { toast } from "@/hooks/fun/use-toast";
 import { useUserSettings, useSaveUserSettings, type Surcharge } from "@/hooks/fun/use-user-settings";
 import { useTags, useCreateTag, useUpdateTag, useDeleteTag } from "@/hooks/fun/use-tags";
 import { createClient } from "@/lib/supabase/client";
+import { useSkinContext } from "@/lib/skin-context";
 
 const ICON_OPTIONS = ["tag", "star", "heart", "zap", "crown", "flag", "bookmark", "award", "flame", "diamond", "gift", "sparkles", "circle-dot", "target", "shield"] as const;
 const COLOR_OPTIONS = ["#6366f1", "#f43f5e", "#10b981", "#f59e0b", "#3b82f6", "#8b5cf6", "#ec4899", "#14b8a6", "#f97316", "#64748b"];
@@ -30,6 +31,7 @@ export default function ClassicSettings() {
   const supabase = createClient();
   const { data: settings, isLoading } = useUserSettings();
   const saveSettings = useSaveUserSettings();
+  const { skin, setSkin } = useSkinContext();
 
   const [businessName, setBusinessName] = useState("");
   const [contactName, setContactName] = useState("");
@@ -43,6 +45,7 @@ export default function ClassicSettings() {
   const [aiMasterPrompt, setAiMasterPrompt] = useState("");
   const [allowItemRemoval, setAllowItemRemoval] = useState(true);
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [savingSection, setSavingSection] = useState<string | null>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -62,13 +65,17 @@ export default function ClassicSettings() {
   }, [settings]);
 
   const handleSaveBusinessInfo = async () => {
-    await saveSettings.mutateAsync({ business_name: businessName, contact_name: contactName, email, phone });
-    toast({ title: "Saved", description: "Business info updated." });
+    setSavingSection("business");
+    try {
+      await saveSettings.mutateAsync({ business_name: businessName, contact_name: contactName, email, phone });
+    } finally { setSavingSection(null); }
   };
 
   const handleSaveRules = async () => {
-    await saveSettings.mutateAsync({ minimum_orders: minimumOrders, surcharges });
-    toast({ title: "Rules saved", description: "Pricing rules updated." });
+    setSavingSection("rules");
+    try {
+      await saveSettings.mutateAsync({ minimum_orders: minimumOrders, surcharges });
+    } finally { setSavingSection(null); }
   };
 
   const handleLogoUpload = async (files: FileList | null) => {
@@ -143,7 +150,7 @@ export default function ClassicSettings() {
             <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Email</label><Input value={email} onChange={(e) => setEmail(e.target.value)} className="text-sm" /></div>
             <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Phone</label><Input value={phone} onChange={(e) => setPhone(e.target.value)} className="text-sm" /></div>
           </div>
-          <Button className="mt-4" size="sm" onClick={handleSaveBusinessInfo} disabled={saveSettings.isPending}>{saveSettings.isPending ? "Saving..." : "Save Info"}</Button>
+          <Button className="mt-4" size="sm" onClick={handleSaveBusinessInfo} disabled={savingSection === "business"}>{savingSection === "business" ? "Saving..." : "Save Info"}</Button>
         </section>
 
         {/* URL Slug */}
@@ -154,7 +161,7 @@ export default function ClassicSettings() {
             <span className="text-sm text-muted-foreground">/p/</span>
             <Input value={urlSlug} onChange={(e) => setUrlSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))} className="max-w-xs text-sm font-mono" placeholder="your-business-name" />
           </div>
-          <Button className="mt-4" size="sm" onClick={async () => { await saveSettings.mutateAsync({ url_slug: urlSlug } as any); toast({ title: "Saved", description: "URL slug updated." }); }} disabled={saveSettings.isPending}>{saveSettings.isPending ? "Saving..." : "Save URL"}</Button>
+          <Button className="mt-4" size="sm" onClick={async () => { setSavingSection("url"); try { await saveSettings.mutateAsync({ url_slug: urlSlug } as any); } finally { setSavingSection(null); } }} disabled={savingSection === "url"}>{savingSection === "url" ? "Saving..." : "Save URL"}</Button>
         </section>
 
         {/* Terminology */}
@@ -164,7 +171,7 @@ export default function ClassicSettings() {
             <label className="mb-1 block text-xs font-medium text-muted-foreground">What do you call the items in an option?</label>
             <Input value={itemLabel} onChange={(e) => setItemLabel(e.target.value)} className="max-w-xs text-sm" placeholder="designs" />
           </div>
-          <Button className="mt-4" size="sm" onClick={async () => { await saveSettings.mutateAsync({ item_label: itemLabel } as any); toast({ title: "Saved", description: "Terminology updated." }); }} disabled={saveSettings.isPending}>{saveSettings.isPending ? "Saving..." : "Save Terminology"}</Button>
+          <Button className="mt-4" size="sm" onClick={async () => { setSavingSection("terminology"); try { await saveSettings.mutateAsync({ item_label: itemLabel } as any); } finally { setSavingSection(null); } }} disabled={savingSection === "terminology"}>{savingSection === "terminology" ? "Saving..." : "Save Terminology"}</Button>
         </section>
 
         {/* Proposal Behavior */}
@@ -196,7 +203,7 @@ export default function ClassicSettings() {
           <Textarea value={aiMasterPrompt} onChange={(e) => setAiMasterPrompt(e.target.value)}
             placeholder="e.g. Write in a warm, southern-charm style..."
             className="text-sm min-h-[120px]" rows={5} />
-          <Button className="mt-4" size="sm" onClick={async () => { await saveSettings.mutateAsync({ ai_master_prompt: aiMasterPrompt } as any); toast({ title: "Saved", description: "AI writing style updated." }); }} disabled={saveSettings.isPending}>{saveSettings.isPending ? "Saving..." : "Save AI Style"}</Button>
+          <Button className="mt-4" size="sm" onClick={async () => { setSavingSection("ai"); try { await saveSettings.mutateAsync({ ai_master_prompt: aiMasterPrompt } as any); } finally { setSavingSection(null); } }} disabled={savingSection === "ai"}>{savingSection === "ai" ? "Saving..." : "Save AI Style"}</Button>
         </section>
 
         {/* Pricing Rules */}
@@ -251,7 +258,27 @@ export default function ClassicSettings() {
               </div>
             </div>
           </div>
-          <Button className="mt-4" size="sm" onClick={handleSaveRules} disabled={saveSettings.isPending}>{saveSettings.isPending ? "Saving..." : "Save Rules"}</Button>
+          <Button className="mt-4" size="sm" onClick={handleSaveRules} disabled={savingSection === "rules"}>{savingSection === "rules" ? "Saving..." : "Save Rules"}</Button>
+        </section>
+
+        {/* Appearance */}
+        <section className="rounded-lg border p-6">
+          <h3 className="mb-4 text-sm font-semibold">Appearance</h3>
+          <p className="mb-3 text-xs text-muted-foreground">Switch between the Fun (visual cards) and Classic (table-based) UI.</p>
+          <div className="flex gap-3">
+            <button onClick={() => setSkin("fun")}
+              className={`flex-1 rounded-lg border-2 p-4 text-center transition-all ${skin === "fun" ? "border-primary bg-primary/10" : "border-border text-muted-foreground hover:border-primary/50"}`}>
+              <Sparkles className="mx-auto mb-2 h-5 w-5" />
+              <p className="text-sm font-medium">Fun</p>
+              <p className="text-[10px] text-muted-foreground">Visual cards</p>
+            </button>
+            <button onClick={() => setSkin("classic")}
+              className={`flex-1 rounded-lg border-2 p-4 text-center transition-all ${skin === "classic" ? "border-primary bg-primary/10" : "border-border text-muted-foreground hover:border-primary/50"}`}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mx-auto mb-2 h-5 w-5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              <p className="text-sm font-medium">Classic</p>
+              <p className="text-[10px] text-muted-foreground">Tables &amp; forms</p>
+            </button>
+          </div>
         </section>
       </div>
     </div>
