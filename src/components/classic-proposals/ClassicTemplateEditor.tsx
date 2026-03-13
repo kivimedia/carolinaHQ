@@ -93,7 +93,7 @@ export default function ClassicTemplateEditor({ templateId }: ClassicTemplateEdi
   const availableProducts = products.filter((p) => !addedProductIds.includes(p.id));
 
   return (
-    <div className="p-4 sm:p-6">
+    <div className="flex-1 overflow-auto p-4 sm:p-6">
       <div className="mb-6 flex items-center gap-4">
         <Button variant="ghost" size="sm" onClick={() => router.push("/proposals/templates")}><ArrowLeft className="mr-1 h-4 w-4" /> Back</Button>
         <h2 className="text-xl font-bold">Edit Template</h2>

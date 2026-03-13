@@ -108,7 +108,7 @@ export default function ClassicOptionEditor({ optionId }: ClassicOptionEditorPro
   if (isLoading) return <div className="flex items-center justify-center p-12"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>;
 
   return (
-    <div className="p-4 sm:p-6">
+    <div className="flex-1 overflow-auto p-4 sm:p-6">
       <div className="mb-6 flex items-center gap-4">
         <Button variant="ghost" size="sm" onClick={() => router.push("/proposals/options")}><ArrowLeft className="mr-1 h-4 w-4" /> Back</Button>
         <h2 className="text-xl font-bold">Edit Option</h2>

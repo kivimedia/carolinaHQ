@@ -108,7 +108,7 @@ export default function ClassicSettings() {
   const minimumOrderTypes = Object.keys(minimumOrders);
 
   return (
-    <div className="p-4 sm:p-6">
+    <div className="flex-1 overflow-auto p-4 sm:p-6">
       <h2 className="mb-6 text-xl font-bold">Settings</h2>
 
       <div className="max-w-2xl space-y-6">
