@@ -159,16 +159,16 @@ export default function ClassicDashboard() {
               )}
             </div>
           ) : (
-            <div className="rounded-lg border">
+            <div className="rounded-lg border overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Client</TableHead>
-                    <TableHead>Event</TableHead>
-                    <TableHead>Date</TableHead>
+                    <TableHead className="hidden md:table-cell">Event</TableHead>
+                    <TableHead className="hidden lg:table-cell">Date</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="text-right">Total</TableHead>
-                    <TableHead>Created</TableHead>
+                    <TableHead className="hidden md:table-cell">Created</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -184,16 +184,19 @@ export default function ClassicDashboard() {
                           {p.proposal_number && (
                             <span className="ml-2 text-xs text-muted-foreground font-mono">{p.proposal_number}</span>
                           )}
+                          <div className="md:hidden text-xs text-muted-foreground mt-0.5">
+                            {p.event_type || ''}{p.event_date ? ` · ${p.event_date}` : ''}
+                          </div>
                         </TableCell>
-                        <TableCell className="text-sm">{p.event_type || '-'}</TableCell>
-                        <TableCell className="text-sm">{p.event_date || '-'}</TableCell>
+                        <TableCell className="text-sm hidden md:table-cell">{p.event_type || '-'}</TableCell>
+                        <TableCell className="text-sm hidden lg:table-cell">{p.event_date || '-'}</TableCell>
                         <TableCell>
                           <Badge variant={cfg.variant} className="text-xs">{cfg.label}</Badge>
                         </TableCell>
                         <TableCell className="text-right font-mono font-medium">
                           ${(p.total || 0).toLocaleString()}
                         </TableCell>
-                        <TableCell className="text-xs text-muted-foreground">
+                        <TableCell className="text-xs text-muted-foreground hidden md:table-cell">
                           {p.created_at ? formatDistanceToNow(new Date(p.created_at), { addSuffix: true }) : '-'}
                         </TableCell>
                         <TableCell className="text-right">

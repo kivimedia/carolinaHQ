@@ -128,15 +128,15 @@ export default function ClassicProducts() {
             ))}
           </div>
 
-          <div className="rounded-lg border">
+          <div className="rounded-lg border overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-12">Image</TableHead>
                   <TableHead>Name</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Sizes</TableHead>
-                  <TableHead className="text-right">Base Price</TableHead>
+                  <TableHead className="hidden md:table-cell">Category</TableHead>
+                  <TableHead className="hidden lg:table-cell">Sizes</TableHead>
+                  <TableHead className="text-right">Price</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -154,9 +154,12 @@ export default function ClassicProducts() {
                       <Link href={`/proposals/products/${product.id}/edit`} className="hover:underline">
                         {product.name}
                       </Link>
+                      <div className="md:hidden text-xs text-muted-foreground mt-0.5">
+                        <Badge variant="outline" className="text-[10px]">{product.category}</Badge>
+                      </div>
                     </TableCell>
-                    <TableCell><Badge variant="outline" className="text-xs">{product.category}</Badge></TableCell>
-                    <TableCell className="text-xs text-muted-foreground">
+                    <TableCell className="hidden md:table-cell"><Badge variant="outline" className="text-xs">{product.category}</Badge></TableCell>
+                    <TableCell className="text-xs text-muted-foreground hidden lg:table-cell">
                       {product.sizes.map((s) => `${s.name}: $${s.price}`).join(', ') || '-'}
                     </TableCell>
                     <TableCell className="text-right font-mono text-sm">

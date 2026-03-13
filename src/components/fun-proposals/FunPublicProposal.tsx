@@ -336,8 +336,8 @@ export default function FunPublicProposal({ proposalId }: FunPublicProposalProps
   };
 
   return (
-    <div className="min-h-screen bg-muted/30 py-8 px-4">
-      <div className="mx-auto w-full max-w-lg rounded-xl bg-card shadow-2xl ring-1 ring-border">
+    <div className="min-h-screen bg-muted/30 py-4 sm:py-8 px-3 sm:px-4">
+      <div className="mx-auto w-full max-w-lg rounded-xl bg-card shadow-2xl ring-1 ring-border overflow-hidden">
         {/* Accepted Banner */}
         {alreadyAccepted && (
           <div className="flex items-center justify-center gap-2 rounded-t-xl bg-emerald-50 px-4 py-3 dark:bg-emerald-950/30">
@@ -348,7 +348,7 @@ export default function FunPublicProposal({ proposalId }: FunPublicProposalProps
           </div>
         )}
         {/* Cover */}
-        <div className="p-10 text-center">
+        <div className="p-6 sm:p-10 text-center">
           {ownerSettings?.logo_url ? (
             <div className="mx-auto mb-4 flex h-16 w-auto items-center justify-center">
               <img src={ownerSettings.logo_url} alt="Business logo" className="max-h-full max-w-[220px] object-contain" />
@@ -384,7 +384,7 @@ export default function FunPublicProposal({ proposalId }: FunPublicProposalProps
         <div className="gold-divider" />
 
         {/* Event Details */}
-        <div className="p-8">
+        <div className="p-5 sm:p-8">
           <h2 className="mb-4 font-display text-base font-semibold text-primary">YOUR EVENT</h2>
           <div className="space-y-3 rounded-lg bg-blush p-5 text-sm">
             {[
@@ -423,7 +423,7 @@ export default function FunPublicProposal({ proposalId }: FunPublicProposalProps
 
         {/* Products */}
         {lineItems.length > 0 && (
-          <div className="p-8">
+          <div className="p-5 sm:p-8">
             <h2 className="mb-5 font-display text-base font-semibold text-primary uppercase">Your {itemLabel}</h2>
             <div className="space-y-4">
               {lineItems.map((item, i) => {
@@ -525,7 +525,7 @@ export default function FunPublicProposal({ proposalId }: FunPublicProposalProps
         {hasOptions && (
           <>
             <div className="gold-divider" />
-            <div className="p-8">
+            <div className="p-5 sm:p-8">
               <h2 className="mb-5 font-display text-base font-semibold text-primary uppercase">
                 Choose Your Preferred Option
               </h2>
@@ -596,14 +596,14 @@ export default function FunPublicProposal({ proposalId }: FunPublicProposalProps
         <div className="gold-divider" />
 
         {/* Accept Section */}
-        <div className="p-8">
+        <div className="p-5 sm:p-8">
           {!hasOptions && activeLineItems.length > 0 && (
             <>
               <h2 className="mb-4 font-display text-base font-semibold text-primary">INVESTMENT SUMMARY</h2>
               <div className="space-y-2 text-sm">
                 {activeLineItems.filter(item => (item.unit_price * (item.quantity || 1)) > 0).map((item) => (
-                  <div key={item.id} className="flex justify-between">
-                    <span className="text-muted-foreground">{item.product_name} ({item.selected_size})</span>
+                  <div key={item.id} className="flex justify-between gap-2">
+                    <span className="text-muted-foreground truncate">{item.product_name} ({item.selected_size})</span>
                     <span className="font-mono font-medium text-foreground">
                       ${(item.unit_price * (item.quantity || 1)).toLocaleString()}
                     </span>
@@ -660,7 +660,7 @@ export default function FunPublicProposal({ proposalId }: FunPublicProposalProps
         </div>
 
         {/* Footer */}
-        <div className="rounded-b-xl bg-secondary p-8 text-center">
+        <div className="rounded-b-xl bg-secondary p-5 sm:p-8 text-center">
           <p className="font-display text-sm italic text-gold">
             &quot;Let&apos;s create something amazing&quot;
           </p>

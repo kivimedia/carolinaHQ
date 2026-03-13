@@ -43,7 +43,7 @@ export default function PortalPageClient({ clientId, clientName }: PortalPageCli
     <div className="flex-1 overflow-y-auto bg-cream">
       {/* Tab Navigation */}
       <div className="border-b border-cream-dark bg-white/80 backdrop-blur-sm sticky top-0 z-10">
-        <div className="px-6">
+        <div className="px-4 sm:px-6">
           <nav className="flex gap-1 -mb-px">
             {TABS.map((tab) => (
               <button
@@ -68,7 +68,7 @@ export default function PortalPageClient({ clientId, clientName }: PortalPageCli
       </div>
 
       {/* Tab Content */}
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         {activeTab === 'board' && (
           <ClientPortalKanban key={refreshKey} clientId={clientId} />
         )}

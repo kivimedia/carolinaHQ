@@ -21,7 +21,7 @@ export default function Error({
   };
 
   return (
-    <div className="min-h-screen bg-cream dark:bg-navy flex items-center justify-center p-6">
+    <div className="min-h-screen bg-cream dark:bg-navy flex items-center justify-center p-4 sm:p-6">
       <div className="max-w-xl w-full bg-white dark:bg-dark-surface rounded-2xl border-2 border-red-200 dark:border-red-900/50 p-8">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center shrink-0">

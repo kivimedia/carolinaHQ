@@ -30,7 +30,7 @@ export default function PendingApprovalPage() {
   };
 
   return (
-    <div className="min-h-screen bg-cream dark:bg-navy flex items-center justify-center p-6">
+    <div className="min-h-screen bg-cream dark:bg-navy flex items-center justify-center p-4 sm:p-6">
       <div className="max-w-md w-full bg-white dark:bg-dark-surface rounded-2xl border-2 border-cream-dark dark:border-slate-700 p-8 text-center">
         <div className="w-16 h-16 rounded-2xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mx-auto mb-6">
           <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-600">

@@ -23,7 +23,7 @@ export default async function PerformancePage() {
       <Sidebar initialBoards={boards || []} />
       <main className="flex-1 flex flex-col overflow-hidden">
         <Header title="Performance" />
-        <div className="flex-1 overflow-auto p-6">
+        <div className="flex-1 overflow-auto p-4 sm:p-6">
           <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-border p-16 text-center">
             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mb-4 text-muted-foreground">
               <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />

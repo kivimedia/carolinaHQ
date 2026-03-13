@@ -52,31 +52,41 @@ export default function ClassicTemplates() {
           <p className="text-sm text-muted-foreground">No templates yet.</p>
         </div>
       ) : (
-        <div className="rounded-lg border">
+        <div className="rounded-lg border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Colors</TableHead>
+                <TableHead className="hidden md:table-cell">Colors</TableHead>
                 <TableHead>Name</TableHead>
-                <TableHead>Event Types</TableHead>
+                <TableHead className="hidden lg:table-cell">Event Types</TableHead>
                 <TableHead className="text-center"># Products</TableHead>
-                <TableHead className="text-center"># Options</TableHead>
-                <TableHead>Default</TableHead>
+                <TableHead className="text-center hidden md:table-cell"># Options</TableHead>
+                <TableHead className="hidden md:table-cell">Default</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {templates.map((t) => (
                 <TableRow key={t.id}>
-                  <TableCell>
+                  <TableCell className="hidden md:table-cell">
                     <div className="flex gap-1">
                       {t.colors.map((c, i) => (
                         <div key={i} className="h-5 w-5 rounded-full border" style={{ backgroundColor: c }} />
                       ))}
                     </div>
                   </TableCell>
-                  <TableCell className="font-medium">{t.name}</TableCell>
-                  <TableCell>
+                  <TableCell className="font-medium">
+                    <div className="flex items-center gap-2">
+                      <div className="md:hidden flex gap-0.5 flex-shrink-0">
+                        {t.colors.map((c, i) => (
+                          <div key={i} className="h-3 w-3 rounded-full border" style={{ backgroundColor: c }} />
+                        ))}
+                      </div>
+                      {t.name}
+                    </div>
+                    {t.is_default && <Badge className="text-[10px] md:hidden mt-0.5">Default</Badge>}
+                  </TableCell>
+                  <TableCell className="hidden lg:table-cell">
                     <div className="flex flex-wrap gap-1">
                       {t.event_types.map((et) => (
                         <Badge key={et} variant="outline" className="text-[10px]">{et}</Badge>
@@ -85,8 +95,8 @@ export default function ClassicTemplates() {
                     </div>
                   </TableCell>
                   <TableCell className="text-center">{t.default_line_items.length}</TableCell>
-                  <TableCell className="text-center">{t.options.length}</TableCell>
-                  <TableCell>
+                  <TableCell className="text-center hidden md:table-cell">{t.options.length}</TableCell>
+                  <TableCell className="hidden md:table-cell">
                     {t.is_default && <Badge className="text-xs">Default</Badge>}
                   </TableCell>
                   <TableCell className="text-right">
@@ -97,7 +107,7 @@ export default function ClassicTemplates() {
                       <Button variant="ghost" size="sm" className="h-7" onClick={() => router.push(`/proposals/templates/${t.id}/edit`)}>
                         <Pencil className="h-3 w-3" />
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-7" onClick={() => duplicateTemplate.mutate(t)} disabled={duplicateTemplate.isPending}>
+                      <Button variant="ghost" size="sm" className="h-7 hidden sm:inline-flex" onClick={() => duplicateTemplate.mutate(t)} disabled={duplicateTemplate.isPending}>
                         <Copy className="h-3 w-3" />
                       </Button>
                       <Button variant="ghost" size="sm" className="h-7 text-destructive" onClick={() => setDeleteId(t.id)}>

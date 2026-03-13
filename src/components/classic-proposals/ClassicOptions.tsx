@@ -58,28 +58,37 @@ export default function ClassicOptions() {
           <p className="text-sm text-muted-foreground">No options yet. Create your first package.</p>
         </div>
       ) : (
-        <div className="rounded-lg border">
+        <div className="rounded-lg border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
-                <TableHead>Description</TableHead>
+                <TableHead className="hidden md:table-cell">Description</TableHead>
                 <TableHead className="text-center"># Items</TableHead>
-                <TableHead className="text-right">Display Price</TableHead>
-                <TableHead className="text-right">Inner Total</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Price</TableHead>
+                <TableHead className="text-right hidden lg:table-cell">Inner Total</TableHead>
+                <TableHead className="hidden md:table-cell">Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {options.map((opt) => (
                 <TableRow key={opt.id}>
-                  <TableCell className="font-medium">{opt.name}</TableCell>
-                  <TableCell className="max-w-[200px] truncate text-sm text-muted-foreground">{opt.description || '-'}</TableCell>
+                  <TableCell className="font-medium">
+                    {opt.name}
+                    <div className="md:hidden text-xs text-muted-foreground mt-0.5">
+                      {opt.is_active ? (
+                        <Badge variant="outline" className="text-[10px] text-emerald-600">Active</Badge>
+                      ) : (
+                        <Badge variant="secondary" className="text-[10px]">Inactive</Badge>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell className="max-w-[200px] truncate text-sm text-muted-foreground hidden md:table-cell">{opt.description || '-'}</TableCell>
                   <TableCell className="text-center">{opt.items.length}</TableCell>
                   <TableCell className="text-right font-mono">${opt.display_price.toLocaleString()}</TableCell>
-                  <TableCell className="text-right font-mono text-muted-foreground">${opt.inner_total.toLocaleString()}</TableCell>
-                  <TableCell>
+                  <TableCell className="text-right font-mono text-muted-foreground hidden lg:table-cell">${opt.inner_total.toLocaleString()}</TableCell>
+                  <TableCell className="hidden md:table-cell">
                     {opt.is_active ? (
                       <Badge variant="outline" className="text-xs text-emerald-600">Active</Badge>
                     ) : (
