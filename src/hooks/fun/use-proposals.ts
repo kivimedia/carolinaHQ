@@ -39,6 +39,7 @@ export interface DbProposal {
 export function useProposals() {
   return useQuery({
     queryKey: ['proposals'],
+    retry: 1,
     queryFn: async (): Promise<DbProposal[]> => {
       const supabase = createBrowserSupabaseClient();
       const { data, error } = await supabase

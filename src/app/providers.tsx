@@ -5,6 +5,7 @@ import { useState } from 'react';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import KeyboardShortcutsProvider from '@/components/layout/KeyboardShortcutsProvider';
 import { SkinProvider } from '@/lib/skin-context';
+import { Toaster } from '@/components/ui-shadcn/sonner';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -25,6 +26,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         <SkinProvider>
           <KeyboardShortcutsProvider>
             {children}
+            <Toaster richColors position="top-right" />
           </KeyboardShortcutsProvider>
         </SkinProvider>
       </QueryClientProvider>

@@ -33,7 +33,7 @@ type Tab = 'proposals' | 'queue' | 'learning';
 export default function ClassicDashboard() {
   const [tab, setTab] = useState<Tab>('proposals');
   const [filter, setFilter] = useState('All');
-  const { data: proposals = [], isLoading } = useProposals();
+  const { data: proposals = [], isLoading, isError } = useProposals();
   const deleteProposal = useDeleteProposal();
   const acceptProposal = useAcceptProposal();
 
@@ -137,9 +137,13 @@ export default function ClassicDashboard() {
             ))}
           </div>
 
-          {isLoading ? (
+          {isLoading && !isError ? (
             <div className="flex items-center justify-center p-12">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : isError ? (
+            <div className="rounded-lg border-2 border-dashed border-destructive/30 p-12 text-center">
+              <p className="text-sm text-destructive">Failed to load proposals. Please refresh the page.</p>
             </div>
           ) : filtered.length === 0 ? (
             <div className="rounded-lg border-2 border-dashed p-12 text-center">

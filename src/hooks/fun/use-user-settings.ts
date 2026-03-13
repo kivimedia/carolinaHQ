@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
 
 export interface Surcharge {
   label: string;
@@ -89,6 +90,10 @@ export function useSaveUserSettings() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-settings', user?.id] });
+      toast.success('Settings saved');
+    },
+    onError: (error) => {
+      toast.error(`Failed to save settings: ${error.message}`);
     },
   });
 }

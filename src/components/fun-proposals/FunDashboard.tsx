@@ -55,7 +55,7 @@ const CONFIDENCE_CONFIG: Record<string, { label: string; className: string }> = 
 
 export default function FunDashboard() {
   const [activeFilter, setActiveFilter] = useState<string>("All");
-  const { data: proposals = [], isLoading } = useProposals();
+  const { data: proposals = [], isLoading, isError } = useProposals();
   const acceptProposal = useAcceptProposal();
   const deleteProposal = useDeleteProposal();
   const { data: allTags = [] } = useTags();
@@ -170,9 +170,13 @@ export default function FunDashboard() {
       </div>
 
       {/* Proposal Cards */}
-      {isLoading ? (
+      {isLoading && !isError ? (
         <div className="flex items-center justify-center p-12">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      ) : isError ? (
+        <div className="rounded-xl border-2 border-dashed border-destructive/30 p-12 text-center">
+          <p className="text-sm text-destructive">Failed to load proposals. Please refresh the page.</p>
         </div>
       ) : filteredProposals.length === 0 ? (
         <div className="rounded-xl border-2 border-dashed border-border p-12 text-center">
