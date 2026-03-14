@@ -1802,26 +1802,21 @@ export interface GoogleIntegration {
   updated_at: string;
 }
 
-// Didn't Book reasons
+// Didn't Book reasons (matches PRD Section 13 - Halley's actual categories)
 export type DidntBookReason =
-  | 'too_expensive'
-  | 'went_with_competitor'
-  | 'event_cancelled'
-  | 'no_response'
-  | 'timing_issue'
-  | 'out_of_service_area'
-  | 'other';
+  | 'no_reason'
+  | 'no_budget'
+  | 'went_with_different_vendor'
+  | 'ghosted'
+  | 'chose_different_direction'
+  | 'never_received_emails'
+  | 'i_turned_it_down';
 
 export type DidntBookSubReason =
-  | 'budget_under_200'
-  | 'budget_200_500'
-  | 'wanted_discount'
-  | 'found_cheaper'
-  | 'preferred_style'
-  | 'ghosted_after_quote'
-  | 'ghosted_before_quote'
-  | 'too_last_minute'
-  | 'date_unavailable'
+  | 'too_far'
+  | 'too_small'
+  | 'busy_weekend'
+  | 'scheduling_conflict'
   | 'other';
 
 // Lead source tracking

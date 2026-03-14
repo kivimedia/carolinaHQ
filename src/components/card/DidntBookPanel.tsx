@@ -11,36 +11,29 @@ interface DidntBookPanelProps {
 }
 
 const REASONS: { value: DidntBookReason; label: string }[] = [
-  { value: 'too_expensive', label: 'Too Expensive' },
-  { value: 'went_with_competitor', label: 'Went With Competitor' },
-  { value: 'event_cancelled', label: 'Event Cancelled' },
-  { value: 'no_response', label: 'No Response' },
-  { value: 'timing_issue', label: 'Timing Issue' },
-  { value: 'out_of_service_area', label: 'Out of Service Area' },
-  { value: 'other', label: 'Other' },
+  { value: 'no_reason', label: 'No Reason Given' },
+  { value: 'no_budget', label: 'No Budget / Didn\'t Have Money' },
+  { value: 'went_with_different_vendor', label: 'Went With Different Vendor' },
+  { value: 'ghosted', label: 'Ghosted' },
+  { value: 'chose_different_direction', label: 'Chose Different Direction' },
+  { value: 'never_received_emails', label: 'Never Received Emails' },
+  { value: 'i_turned_it_down', label: 'I Turned It Down' },
 ];
 
 const SUB_REASONS: Record<DidntBookReason, { value: DidntBookSubReason; label: string }[]> = {
-  too_expensive: [
-    { value: 'budget_under_200', label: 'Budget Under $200' },
-    { value: 'budget_200_500', label: '$200-$500 Range' },
-    { value: 'wanted_discount', label: 'Wanted Discount' },
+  no_reason: [],
+  no_budget: [],
+  went_with_different_vendor: [],
+  ghosted: [],
+  chose_different_direction: [],
+  never_received_emails: [],
+  i_turned_it_down: [
+    { value: 'too_far', label: 'Too Far' },
+    { value: 'too_small', label: 'Too Small' },
+    { value: 'busy_weekend', label: 'Busy Weekend' },
+    { value: 'scheduling_conflict', label: 'Scheduling Conflict' },
+    { value: 'other', label: 'Other' },
   ],
-  went_with_competitor: [
-    { value: 'found_cheaper', label: 'Found Cheaper Option' },
-    { value: 'preferred_style', label: 'Preferred Their Style' },
-  ],
-  event_cancelled: [],
-  no_response: [
-    { value: 'ghosted_after_quote', label: 'Ghosted After Quote' },
-    { value: 'ghosted_before_quote', label: 'Ghosted Before Quote' },
-  ],
-  timing_issue: [
-    { value: 'too_last_minute', label: 'Too Last Minute' },
-    { value: 'date_unavailable', label: 'Date Unavailable' },
-  ],
-  out_of_service_area: [],
-  other: [],
 };
 
 export default function DidntBookPanel({ reason, subReason, onUpdate }: DidntBookPanelProps) {
