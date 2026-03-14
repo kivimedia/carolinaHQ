@@ -8,6 +8,14 @@ import CardCheckbox from './CardCheckbox';
 import CardQuickEdit from './CardQuickEdit';
 import { slugify } from '@/lib/slugify';
 
+// Cities considered "local" for Carolina Balloons (no surcharge)
+const LOCAL_CITIES = [
+  'charlotte', 'concord', 'huntersville', 'cornelius', 'davidson',
+  'mooresville', 'matthews', 'mint hill', 'indian trail', 'weddington',
+  'waxhaw', 'pineville', 'fort mill', 'rock hill', 'gastonia',
+  'belmont', 'mount holly', 'harrisburg', 'kannapolis',
+];
+
 interface BoardCardProps {
   card: Card;
   placement_id: string;
@@ -26,6 +34,7 @@ interface BoardCardProps {
   boardId?: string;
   boardName?: string;
   onRefresh?: () => void;
+  busyDates?: Set<string>;
 }
 
 /**
@@ -70,6 +79,7 @@ export default function BoardCard({
   boardId,
   boardName,
   onRefresh,
+  busyDates,
 }: BoardCardProps) {
   const [showQuickEdit, setShowQuickEdit] = useState(false);
   const [copying, setCopying] = useState(false);
@@ -124,6 +134,13 @@ export default function BoardCard({
   const hasDescription = !!card.description?.trim();
   const hasMetaBadges = hasDescription || comment_count > 0 || attachment_count > 0 || checklist_total > 0;
   const showPriority = card.priority && card.priority !== 'none';
+
+  // Capacity badges (BalloonCard fields available at runtime via cards(*) query)
+  const balloonCard = card as unknown as Record<string, unknown>;
+  const eventDate = balloonCard.event_date as string | null;
+  const venueCity = balloonCard.venue_city as string | null;
+  const isFar = venueCity ? !LOCAL_CITIES.includes(venueCity.toLowerCase().trim()) : false;
+  const isBusy = eventDate && busyDates ? busyDates.has(eventDate.split('T')[0]) : false;
 
   return (
     <Draggable draggableId={placement_id} index={index}>
@@ -304,6 +321,22 @@ export default function BoardCard({
                     {card.approval_status === 'revision_requested' && '\u21bb'}
                     {' '}{card.approval_status === 'revision_requested' ? 'Revision' : card.approval_status.charAt(0).toUpperCase() + card.approval_status.slice(1)}
                   </span>
+                </div>
+              )}
+
+              {/* Capacity badges */}
+              {(isBusy || isFar) && (
+                <div className="flex flex-wrap gap-1 mb-1.5">
+                  {isBusy && (
+                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400" title="2+ events on this date">
+                      Busy
+                    </span>
+                  )}
+                  {isFar && (
+                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400" title={`${venueCity} is outside the local service area`}>
+                      Far
+                    </span>
+                  )}
                 </div>
               )}
 

@@ -29,6 +29,7 @@ interface BoardListProps {
   filter?: BoardFilter;
   isLoadingCards?: boolean;
   isDraggingList?: boolean;
+  busyDates?: Set<string>;
 }
 
 /** Apply board filter to a single placement. */
@@ -58,7 +59,7 @@ function matchesFilter(placement: any, filter: BoardFilter | undefined): boolean
   return true;
 }
 
-export default function BoardList({ list, index, boardId, boardName, allLists, onCardClick, onRefresh, selectedCards, toggleCardSelection, filter, isLoadingCards, isDraggingList }: BoardListProps) {
+export default function BoardList({ list, index, boardId, boardName, allLists, onCardClick, onRefresh, selectedCards, toggleCardSelection, filter, isLoadingCards, isDraggingList, busyDates }: BoardListProps) {
   const [isAddingCard, setIsAddingCard] = useState(false);
   const [newCardTitle, setNewCardTitle] = useState('');
   const [isEditingName, setIsEditingName] = useState(false);
@@ -220,6 +221,7 @@ export default function BoardList({ list, index, boardId, boardName, allLists, o
                         boardId={boardId}
                         boardName={boardName}
                         onRefresh={onRefresh}
+                        busyDates={busyDates}
                       />
                     )
                   ))

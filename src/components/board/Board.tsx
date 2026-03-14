@@ -36,6 +36,25 @@ export default function Board({ board, onRefresh, filter, externalSelectedCardId
     [board.lists]
   );
 
+  // Compute busy dates (2+ events on same day) for capacity badges
+  const busyDates = useMemo(() => {
+    const dateCounts = new Map<string, number>();
+    for (const list of sortedLists) {
+      for (const placement of list.cards) {
+        const eventDate = (placement.card as unknown as Record<string, unknown>).event_date as string | null;
+        if (eventDate) {
+          const dateKey = eventDate.split('T')[0];
+          dateCounts.set(dateKey, (dateCounts.get(dateKey) || 0) + 1);
+        }
+      }
+    }
+    const busy = new Set<string>();
+    dateCounts.forEach((count, date) => {
+      if (count >= 2) busy.add(date);
+    });
+    return busy;
+  }, [sortedLists]);
+
   const allCardIds = useMemo(() => {
     const ids: string[] = [];
     for (const list of sortedLists) {
@@ -333,6 +352,7 @@ export default function Board({ board, onRefresh, filter, externalSelectedCardId
                   filter={filter}
                   isLoadingCards={isLoadingCards}
                   isDraggingList={draggingListType}
+                  busyDates={busyDates}
                 />
               ))}
               {provided.placeholder}
