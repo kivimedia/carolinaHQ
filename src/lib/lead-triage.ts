@@ -12,6 +12,7 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { createNotification } from './notification-service';
 import { evaluateMirrorRules } from './mirror-engine';
+import { draftInitialResponse } from './ai/email-drafter';
 
 interface CardData {
   id: string;
@@ -229,6 +230,11 @@ export async function triageLead(
     }
   }
 
+  // ─── Step 6: Auto-Response Draft (fire-and-forget) ──────────
+  generateAutoResponseDraft(supabase, userId, cardId, boardId, cardData).catch((err) => {
+    console.error('[Triage] Auto-response draft failed:', err);
+  });
+
   return result;
 }
 
@@ -254,6 +260,58 @@ export async function triageLeadApi(
   if (!boardId) return null;
 
   return triageLead(supabase, cardId, boardId, userId);
+}
+
+/**
+ * Generate an AI auto-response draft and store it as a card comment.
+ */
+async function generateAutoResponseDraft(
+  supabase: SupabaseClient,
+  userId: string,
+  cardId: string,
+  boardId: string,
+  card: CardData,
+): Promise<void> {
+  const draft = await draftInitialResponse(supabase, userId, {
+    title: card.title,
+    description: card.description,
+    event_type: card.event_type,
+    event_date: card.event_date,
+    venue_name: card.venue_name,
+    venue_city: card.venue_city,
+    client_email: card.client_email,
+    estimated_value: card.estimated_value,
+  });
+
+  if (!draft) return;
+
+  // Store as a card comment so the user sees it immediately
+  const draftText = `**AI Draft Response** (auto-generated)\n\n**Subject:** ${draft.subject}\n\n${draft.body}\n\n---\n*Review and edit this draft before sending to ${card.client_email || 'the client'}.*`;
+
+  await supabase.from('comments').insert({
+    card_id: cardId,
+    user_id: userId,
+    content: draftText,
+  });
+
+  // Notify admins that a draft is ready
+  const { data: admins } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('user_role', 'admin');
+
+  if (admins) {
+    for (const admin of admins) {
+      await createNotification(supabase, {
+        userId: admin.id,
+        type: 'lead_received',
+        title: `Draft Response Ready: ${card.title}`,
+        body: `AI generated a response email draft. Review it on the card.`,
+        cardId,
+        boardId,
+      });
+    }
+  }
 }
 
 /**
