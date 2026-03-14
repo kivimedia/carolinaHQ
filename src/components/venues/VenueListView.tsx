@@ -22,6 +22,13 @@ interface Venue {
 const VENUE_TYPES = ['hotel', 'event_space', 'church', 'school', 'corporate', 'park', 'restaurant', 'country_club', 'other'];
 const RELATIONSHIP_STATUSES = ['new', 'contacted', 'active_partner', 'inactive'];
 
+interface FriendorDraft {
+  venueId: string;
+  to: string;
+  subject: string;
+  body: string;
+}
+
 export default function VenueListView() {
   const [venues, setVenues] = useState<Venue[]>([]);
   const [loading, setLoading] = useState(true);
@@ -29,6 +36,9 @@ export default function VenueListView() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>('');
   const [search, setSearch] = useState('');
+  const [draftingVenueId, setDraftingVenueId] = useState<string | null>(null);
+  const [friendorDraft, setFriendorDraft] = useState<FriendorDraft | null>(null);
+  const [sendingDraft, setSendingDraft] = useState(false);
 
   // Form state
   const [name, setName] = useState('');
@@ -96,19 +106,45 @@ export default function VenueListView() {
   };
 
   const handleDraftFriendor = async (venue: Venue) => {
+    setDraftingVenueId(venue.id);
     try {
+      const res = await fetch(`/api/venues/${venue.id}/friendor-draft`, { method: 'POST' });
+      if (res.ok) {
+        const json = await res.json();
+        setFriendorDraft({
+          venueId: venue.id,
+          to: json.data.to,
+          subject: json.data.subject,
+          body: json.data.body,
+        });
+      } else {
+        alert('Failed to generate AI draft. Check AI budget or try again.');
+      }
+    } catch (err) {
+      console.error('Draft friendor email failed:', err);
+      alert('Failed to generate AI draft.');
+    } finally {
+      setDraftingVenueId(null);
+    }
+  };
+
+  const handleSendFriendor = async () => {
+    if (!friendorDraft) return;
+    setSendingDraft(true);
+    try {
+      // Create Gmail draft
       const res = await fetch('/api/email/draft', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          to: venue.contact_email,
-          subject: `Partnership Opportunity - Carolina Balloons & ${venue.name}`,
-          body: `Hi ${venue.contact_name || 'there'},\n\nI'm Halley Foye, owner of Carolina Balloons. I'd love to explore a vendor partnership with ${venue.name}.\n\nWould you be open to a quick chat?\n\nBest,\nHalley`,
+          to: friendorDraft.to,
+          subject: friendorDraft.subject,
+          body: friendorDraft.body,
         }),
       });
       if (res.ok) {
         // Mark friendor email as sent
-        await fetch(`/api/venues/${venue.id}`, {
+        await fetch(`/api/venues/${friendorDraft.venueId}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -117,11 +153,17 @@ export default function VenueListView() {
             relationship_status: 'contacted',
           }),
         });
+        setFriendorDraft(null);
         fetchVenues();
         alert('Friendor email draft created in Gmail!');
+      } else {
+        alert('Failed to create Gmail draft. Is Google connected?');
       }
     } catch (err) {
-      console.error('Draft friendor email failed:', err);
+      console.error('Send friendor email failed:', err);
+      alert('Failed to send. Check your Google integration.');
+    } finally {
+      setSendingDraft(false);
     }
   };
 
@@ -237,9 +279,10 @@ export default function VenueListView() {
                     ) : venue.contact_email ? (
                       <button
                         onClick={() => handleDraftFriendor(venue)}
-                        className="text-xs text-pink-600 hover:text-pink-700 dark:text-pink-400"
+                        disabled={draftingVenueId === venue.id}
+                        className="text-xs text-pink-600 hover:text-pink-700 dark:text-pink-400 disabled:opacity-50"
                       >
-                        Draft Email
+                        {draftingVenueId === venue.id ? 'Drafting...' : 'Draft Email'}
                       </button>
                     ) : (
                       <span className="text-xs text-gray-400">No email</span>
@@ -256,6 +299,57 @@ export default function VenueListView() {
               )}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Friendor Draft Preview Modal */}
+      {friendorDraft && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl max-w-xl w-full max-h-[80vh] overflow-y-auto shadow-xl">
+            <div className="p-5 border-b dark:border-gray-700">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Friendor Email Preview</h3>
+              <p className="text-xs text-gray-500 mt-1">AI-generated draft. Review and edit before sending to Gmail.</p>
+            </div>
+            <div className="p-5 space-y-3">
+              <div>
+                <label className="text-xs font-medium text-gray-500 uppercase">To</label>
+                <p className="text-sm text-gray-900 dark:text-gray-100">{friendorDraft.to}</p>
+              </div>
+              <div>
+                <label className="text-xs font-medium text-gray-500 uppercase">Subject</label>
+                <input
+                  type="text"
+                  value={friendorDraft.subject}
+                  onChange={(e) => setFriendorDraft({ ...friendorDraft, subject: e.target.value })}
+                  className="w-full px-3 py-2 text-sm border rounded-lg mt-1 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-gray-500 uppercase">Body</label>
+                <textarea
+                  value={friendorDraft.body}
+                  onChange={(e) => setFriendorDraft({ ...friendorDraft, body: e.target.value })}
+                  rows={10}
+                  className="w-full px-3 py-2 text-sm border rounded-lg mt-1 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+                />
+              </div>
+            </div>
+            <div className="p-5 border-t dark:border-gray-700 flex justify-end gap-2">
+              <button
+                onClick={() => setFriendorDraft(null)}
+                className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSendFriendor}
+                disabled={sendingDraft}
+                className="px-4 py-2 text-sm text-white bg-pink-600 rounded-lg hover:bg-pink-700 disabled:opacity-50 font-medium"
+              >
+                {sendingDraft ? 'Creating Draft...' : 'Create Gmail Draft'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
