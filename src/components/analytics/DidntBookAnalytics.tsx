@@ -94,8 +94,8 @@ export default function DidntBookAnalytics() {
         <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
           All Cards ({data.cards.length})
         </h3>
-        <div className="border rounded-lg overflow-hidden dark:border-gray-700">
-          <table className="w-full text-sm">
+        <div className="border rounded-lg overflow-x-auto dark:border-gray-700">
+          <table className="w-full text-sm min-w-[500px]">
             <thead className="bg-gray-50 dark:bg-gray-800">
               <tr>
                 <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400">Client</th>

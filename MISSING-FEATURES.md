@@ -5,33 +5,28 @@
 
 ## Gap 1: Auto-response draft not wired to triage (S5)
 - **Severity**: MEDIUM
-- **Status**: TODO
-- **Details**: `draftInitialResponse()` exists in `src/lib/ai/email-drafter.ts` but `triageLead()` in `src/lib/lead-triage.ts` does not call it. New leads go through triage but no auto-response email draft is generated.
-- **Fix**: Wire `draftInitialResponse()` call at the end of `triageLead()`, store the draft, and surface it for approval.
+- **Status**: DONE (commit 32a92ab)
+- **Details**: Wired `draftInitialResponse()` into `triageLead()` as fire-and-forget Step 6. AI draft stored as card comment, admins notified.
 
 ## Gap 2: Follow-up pipeline view (S7)
 - **Severity**: LOW
-- **Status**: TODO
-- **Details**: No dedicated page/view to see all cards needing follow-up. The `follow-up-engine.ts` and cron job exist, but follow-ups only surface as push notifications. There's no "all follow-ups" dashboard where Halley can see every card with a pending `follow_up_date`.
-- **Fix**: Create a `/follow-ups` page with a table/list of all cards that have `follow_up_date` set, grouped by overdue/today/upcoming.
+- **Status**: DONE (commit 0df281d)
+- **Details**: Created `/follow-ups` page with stats bar (Overdue/Today/Upcoming/Total), filter tabs, and clickable card rows that navigate to the board. Added sidebar nav link. Uses `getUpcomingFollowUps()` from follow-up engine.
 
 ## Gap 3: Capacity badges on Kanban cards (S15)
 - **Severity**: LOW
-- **Status**: TODO
-- **Details**: The capacity engine (`src/lib/capacity-engine.ts`) computes Busy Weekend and Far Location flags, and the API exists at `/api/capacity/[date]`. But no badge/indicator appears on Kanban cards to show these flags.
-- **Fix**: In `BoardCard.tsx`, fetch capacity data for cards with `event_date` and show small "Busy" / "Far" badges.
+- **Status**: DONE (commit 6cdea32)
+- **Details**: Added "Busy" (orange) and "Far" (purple) badges to board cards. Busy = 2+ events on the same date across the board. Far = venue_city outside Charlotte metro LOCAL_CITIES list. Computed client-side from loaded board data, no extra API calls.
 
 ## Gap 4: Friendor email send button in Venue UI (S9)
 - **Severity**: LOW
-- **Status**: TODO
-- **Details**: `draftFriendorEmail()` exists in `email-drafter.ts` and `friendor_email_sent` flag exists in the venues table. But the Venue list UI (`VenueListView.tsx`) has no "Send Friendor Email" button or flow.
-- **Fix**: Add a "Send Intro Email" action button on venue rows where `friendor_email_sent = false`. Draft the email, show preview, send on approval, update the flag.
+- **Status**: DONE (commit 2f75974)
+- **Details**: Replaced hardcoded friendor email with AI-powered `draftFriendorEmail()`. Editable preview modal with subject/body before creating Gmail draft. New API at `/api/venues/[id]/friendor-draft`.
 
 ## Gap 5: Mobile audit cleanup (S26)
 - **Severity**: MEDIUM
-- **Status**: IN PROGRESS (some fixes applied 2026-03-14)
-- **Details**: `MOBILE_AUDIT.md` documents 25 issues. Classic table components and public proposal page were fixed on 2026-03-14. Need to verify which issues remain open.
-- **Fix**: Review MOBILE_AUDIT.md, mark resolved items, fix remaining items.
+- **Status**: DONE (2026-03-14)
+- **Details**: All 25 MOBILE_AUDIT.md items reviewed. 23 fully fixed, 2 marked acceptable (tiny badge fonts, card tap targets). Added `overflow-x-auto` to DidntBookAnalytics table. MOBILE_AUDIT.md updated with full status.
 
 ---
 
