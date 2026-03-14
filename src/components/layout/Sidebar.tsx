@@ -30,6 +30,7 @@ const icons = {
   reports: <><line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /></>,
   myTasks: <><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></>,
   performance: <><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" /></>,
+  followUps: <><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /><path d="M8 14h.01" /><path d="M12 14h.01" /><path d="M16 14h.01" /><path d="M8 18h.01" /><path d="M12 18h.01" /></>,
   // Proposal sub-nav icons
   newProposal: <><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></>,
   products: <><line x1="16.5" y1="9.4" x2="7.5" y2="4.21" /><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" /><polyline points="3.27 6.96 12 12.01 20.73 6.96" /><line x1="12" y1="22.08" x2="12" y2="12" /></>,
@@ -292,6 +293,12 @@ export default function Sidebar({ initialBoards }: SidebarProps = {}) {
         <Link href="/my-tasks" className={navLinkClass(pathname?.startsWith('/my-tasks') || false)}>
           <Icon name="myTasks" />
           {!collapsed && <span>My Tasks</span>}
+        </Link>
+
+        {/* Follow-Ups */}
+        <Link href="/follow-ups" className={navLinkClass(pathname?.startsWith('/follow-ups') || false)}>
+          <Icon name="followUps" />
+          {!collapsed && <span>Follow-Ups</span>}
         </Link>
 
         {/* Performance */}
